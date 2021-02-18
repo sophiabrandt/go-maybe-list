@@ -47,11 +47,12 @@ func HumanDate(t time.Time) string {
 }
 
 // addDefaultData adds data for all templates
-func addDefaultData(dt *data.TemplateData, r *http.Request) *data.TemplateData {
+func addDefaultData(e *env.Env, r *http.Request, dt *data.TemplateData) *data.TemplateData {
 	if dt == nil {
 		dt = &data.TemplateData{}
 	}
 	dt.CurrentYear = time.Now().Year()
+	dt.Flash = e.Session.PopString(r, "flash")
 
 	return dt
 }
@@ -69,7 +70,7 @@ func Render(e *env.Env, w http.ResponseWriter, r *http.Request, tmpl string, dt 
 		}
 
 		buf := new(bytes.Buffer)
-		err := ts.Execute(buf, addDefaultData(d, r))
+		err := ts.Execute(buf, addDefaultData(e, r, d))
 		if err != nil {
 			return StatusError{err, http.StatusInternalServerError}
 		}

@@ -22,6 +22,9 @@
         </div>
       </nav>
       <main class="wrapper stack main__content">
+        {{with .Flash}}
+        <div class='flash '>{{.}}</div>
+        {{end}}
         {{template "main" .}}
       </main>
     </body>
