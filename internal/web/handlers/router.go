@@ -14,17 +14,19 @@ func New(e *env.Env) http.Handler {
 	r := e.Router
 
 	// liveness check
-	r.Handler(http.MethodGet, "/debug/health", web.Use(web.Handler{e, Health}, middleware.RequestLogger(e.Log)))
+	r.Handler(http.MethodGet, "/debug/health", web.Use(web.Handler{e, health}, middleware.RequestLogger(e.Log)))
 
 	// signup/register routes
-	r.Handler(http.MethodGet, "/signup", web.Use(web.Handler{e, Signup}, middleware.RequestLogger(e.Log)))
-	r.Handler(http.MethodGet, "/login", web.Use(web.Handler{e, Login}, middleware.RequestLogger(e.Log)))
+	r.Handler(http.MethodGet, "/signup", web.Use(web.Handler{e, signup}, middleware.RequestLogger(e.Log)))
+	r.Handler(http.MethodGet, "/login", web.Use(web.Handler{e, login}, middleware.RequestLogger(e.Log)))
 
 	// maybe routes
 	mg := maybeGroup{
 		maybe: maybe.New(e.Db),
 	}
-	r.Handler(http.MethodGet, "/", web.Use(web.Handler{e, mg.GetAllMaybes}, middleware.RequestLogger(e.Log)))
+	r.Handler(http.MethodGet, "/", web.Use(web.Handler{e, mg.getAllMaybes}, middleware.RequestLogger(e.Log)))
+	r.Handler(http.MethodGet, "/maybes", web.Use(web.Handler{e, mg.getMaybesQueryFilter}, middleware.RequestLogger(e.Log)))
+	r.Handler(http.MethodGet, "/maybes/:id", web.Use(web.Handler{e, mg.getMaybeByID}, middleware.RequestLogger(e.Log)))
 
 	// fileServer
 	fileServer := http.FileServer(web.NeuteredFileSystem{http.Dir("./ui/static/")})

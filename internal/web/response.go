@@ -57,7 +57,7 @@ func addDefaultData(dt *data.TemplateData, r *http.Request) *data.TemplateData {
 }
 
 // Render renders a HTML page to the client.
-func Render(e *env.Env, w http.ResponseWriter, r *http.Request, tmpl string, dt interface{}) error {
+func Render(e *env.Env, w http.ResponseWriter, r *http.Request, tmpl string, dt interface{}, statusCode int) error {
 	w.Header().Set("X-XSS-Protection", "1; mode=block")
 	w.Header().Set("X-Frame-Options", "deny")
 	w.Header().Set("X-Content-Type-Options", "nosniff")
@@ -74,11 +74,11 @@ func Render(e *env.Env, w http.ResponseWriter, r *http.Request, tmpl string, dt 
 			return StatusError{err, http.StatusInternalServerError}
 		}
 
-		w.WriteHeader(http.StatusOK)
+		w.WriteHeader(statusCode)
 		buf.WriteTo(w)
 
 	case error:
-		http.Error(w, d.Error(), http.StatusInternalServerError)
+		http.Error(w, d.Error(), statusCode)
 		return nil
 
 	default:

@@ -8,23 +8,14 @@ import (
 	"github.com/sophiabrandt/go-maybe-list/internal/web"
 )
 
-func Index(e *env.Env, w http.ResponseWriter, r *http.Request) error {
-	if err := web.Render(e, w, r, "home.page.tmpl", &data.TemplateData{}); err != nil {
-		return web.StatusError{err, http.StatusInternalServerError}
-	}
-	return nil
+func index(e *env.Env, w http.ResponseWriter, r *http.Request) error {
+	return web.Render(e, w, r, "home.page.tmpl", &data.TemplateData{}, http.StatusOK)
 }
 
-func Signup(e *env.Env, w http.ResponseWriter, r *http.Request) error {
-	if err := web.Render(e, w, r, "signup.page.tmpl", &data.TemplateData{}); err != nil {
-		return web.StatusError{err, http.StatusInternalServerError}
-	}
-	return nil
+func signup(e *env.Env, w http.ResponseWriter, r *http.Request) error {
+	return web.Render(e, w, r, "signup.page.tmpl", &data.TemplateData{}, http.StatusOK)
 }
 
-func Login(e *env.Env, w http.ResponseWriter, r *http.Request) error {
-	if err := web.Render(e, w, r, "login.page.tmpl", &data.TemplateData{}); err != nil {
-		return web.StatusError{err, http.StatusInternalServerError}
-	}
-	return nil
+func login(e *env.Env, w http.ResponseWriter, r *http.Request) error {
+	return web.Render(e, w, r, "login.page.tmpl", &data.TemplateData{}, http.StatusOK)
 }
