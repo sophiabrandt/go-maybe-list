@@ -1,0 +1,28 @@
+
+{{define "base"}}
+<!doctype html>
+<html lang='en'>
+    <head>
+        <meta charset='utf-8'>
+        <link rel='stylesheet' href='/static/css/reset.min.css'>
+        <link rel='stylesheet' href='/static/css/style.css'>
+        <link rel='shortcut icon' href='/static/img/favicon.ico' type='image/x-icon'>
+        <title>{{template "title" .}} - Maybe List</title>
+    </head>
+    <body>
+      <header class="center header__content">
+        <h1 class="mt"><a href="/">Maybe List</a></h1>
+        <img class="center"src="/static/img/question.svg" alt="question" width="50rem" height="50rem">
+      </header>
+      <nav class="wrapper cluster nav__content">
+        <div>
+          <a href="/">Home</a>
+        </div>
+      </nav>
+      <main class="wrapper stack main__content">
+        {{template "main" .}}
+      </main>
+    </body>
+    {{template "footer" .}}
+</html>
+{{end}}

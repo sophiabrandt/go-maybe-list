@@ -20,8 +20,8 @@ RUN apk update && apk add --no-cache bash
 RUN adduser -D user
 USER user
 
-# # Static Files
-# COPY ./ui /app/ui
+# Static Files
+COPY ./ui /ui
 
 # Binaries
 COPY --from=build-env /app/bin/web /app/

@@ -13,5 +13,10 @@ func NewRouter(e *env.Env) http.Handler {
 
 	r.Handler(http.MethodGet, "/debug/health", use(handler{e, health}, middleware.RequestLogger(e.Log)))
 
+	r.Handler(http.MethodGet, "/", use(handler{e, index}, middleware.RequestLogger(e.Log)))
+
+	fileServer := http.FileServer(neuteredFileSystem{http.Dir("./ui/static/")})
+	r.Handler(http.MethodGet, "/static/*", http.StripPrefix("/static", fileServer))
+
 	return r
 }

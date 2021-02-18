@@ -13,6 +13,7 @@ import (
 	"github.com/sophiabrandt/go-maybe-list/internal/env"
 	"github.com/sophiabrandt/go-maybe-list/internal/server"
 	"github.com/sophiabrandt/go-maybe-list/internal/web"
+	"github.com/sophiabrandt/go-maybe-list/internal/web/templates"
 )
 
 func main() {
@@ -44,7 +45,9 @@ func run(ctx context.Context, log *log.Logger) error {
 	flag.Parse()
 
 	// initialize global dependencies
-	env := env.New(log)
+	tc, err := templates.NewCache("./ui/html")
+
+	env := env.New(log, tc)
 
 	router := web.NewRouter(env)
 
@@ -67,7 +70,6 @@ func run(ctx context.Context, log *log.Logger) error {
 		cancel()
 	}()
 
-	var err error
 	if err = srv.Shutdown(ctxShutdown); err != nil {
 		log.Fatalf("main: Shutdown Failed: %+s", err)
 	}
