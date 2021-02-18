@@ -6,8 +6,10 @@ import (
 	"fmt"
 	"net/http"
 	"path/filepath"
+	"time"
 
 	"github.com/sophiabrandt/go-maybe-list/internal/env"
+	"github.com/sophiabrandt/go-maybe-list/internal/web/templates"
 )
 
 // respond answers the client with JSON.
@@ -40,25 +42,49 @@ func respond(e *env.Env, w http.ResponseWriter, data interface{}, statusCode int
 	return nil
 }
 
+// HumanDate returns time in YYYY-MM-DD format
+func HumanDate(t time.Time) string {
+	return t.Format("2006-01-02")
+}
+
+// addDefaultData adds data for all templates
+func addDefaultData(dt *templates.TemplateData, r *http.Request) *templates.TemplateData {
+	if dt == nil {
+		dt = &templates.TemplateData{}
+	}
+	dt.CurrentYear = time.Now().Year()
+
+	return dt
+}
+
 // render renders a HTML page to the client.
 func render(e *env.Env, w http.ResponseWriter, r *http.Request, tmpl string, data interface{}) error {
 	w.Header().Set("X-XSS-Protection", "1; mode=block")
 	w.Header().Set("X-Frame-Options", "deny")
 	w.Header().Set("X-Content-Type-Options", "nosniff")
+	switch d := data.(type) {
+	case *templates.TemplateData:
+		ts, ok := e.TemplateCache[tmpl]
+		if !ok {
+			return StatusError{fmt.Errorf("Error: no HTML template for available for %s", tmpl), http.StatusInternalServerError}
+		}
 
-	ts, ok := e.TemplateCache[tmpl]
-	if !ok {
-		return StatusError{fmt.Errorf("Error: no HTML template for available for %s", tmpl), http.StatusInternalServerError}
+		buf := new(bytes.Buffer)
+		err := ts.Execute(buf, addDefaultData(d, r))
+		if err != nil {
+			return StatusError{err, http.StatusInternalServerError}
+		}
+
+		w.WriteHeader(http.StatusOK)
+		buf.WriteTo(w)
+
+	case error:
+		http.Error(w, d.Error(), http.StatusInternalServerError)
+		return nil
+
+	default:
+		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
 	}
-
-	buf := new(bytes.Buffer)
-	err := ts.Execute(buf, r)
-	if err != nil {
-		return StatusError{err, http.StatusInternalServerError}
-	}
-
-	w.WriteHeader(http.StatusOK)
-	buf.WriteTo(w)
 	return nil
 }
 

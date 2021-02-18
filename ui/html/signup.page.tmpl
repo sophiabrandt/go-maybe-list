@@ -1,0 +1,30 @@
+{{template "base" .}}
+
+{{define "title"}}Home{{end}}
+
+{{define "main"}}
+<div class="box">
+  <form class="stack" action="/user/signup" method="POST" novalidate>
+    <input type="hidden" name="csrf_token" value="" />
+    <div>
+      <label>Name:</label>
+      <input type="text" name="name" value="" />
+    </div>
+    <div>
+      <label>Email:</label>
+      <input type="email" name="email" value="" />
+    </div>
+    <div>
+      <label>Password:</label>
+      <input type="password" name="password" />
+    </div>
+    <div>
+      <label>Confirm Password:</label>
+      <input type="password" name="password_confirm" />
+    </div>
+    <div>
+      <input type="submit" value="signup" />
+    </div>
+  </form>
+</div>
+{{end}}

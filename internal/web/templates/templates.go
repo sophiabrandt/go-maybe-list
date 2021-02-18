@@ -9,7 +9,8 @@ var functions = template.FuncMap{}
 
 // TemplateData is all data needed for Golang HTML templates.
 type TemplateData struct {
-	Flash string
+	Flash       string
+	CurrentYear int
 }
 
 // NewCache creates a new cache.

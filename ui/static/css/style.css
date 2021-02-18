@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Roboto+Mono&display=swap');
+@import url("https://fonts.googleapis.com/css2?family=Roboto+Mono&display=swap");
 
 :root {
   font-family: "Roboto Mono", sans-serif;
@@ -58,7 +58,12 @@ a:hover {
   text-decoration: underline;
 }
 
-h1, h2, h3, h5, h5, h6,
+h1,
+h2,
+h3,
+h5,
+h5,
+h6,
 p {
   color: var(--color-dark);
 }
@@ -140,6 +145,15 @@ p {
 
 .form {
   min-width: 80%;
+}
+
+form label {
+  display: inline-block;
+}
+
+form input {
+  width: 100%;
+  padding: 0.3rem;
 }
 
 .form label > span {
