@@ -5,15 +5,14 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
-	"path/filepath"
 	"time"
 
+	"github.com/sophiabrandt/go-maybe-list/internal/data"
 	"github.com/sophiabrandt/go-maybe-list/internal/env"
-	"github.com/sophiabrandt/go-maybe-list/internal/web/templates"
 )
 
-// respond answers the client with JSON.
-func respond(e *env.Env, w http.ResponseWriter, data interface{}, statusCode int) error {
+// Respond answers the client with JSON.
+func Respond(e *env.Env, w http.ResponseWriter, data interface{}, statusCode int) error {
 	// Set the content type and headers once we know marshaling has succeeded.
 	w.Header().Set("Content-Type", "application/json")
 	w.Header().Set("X-XSS-Protection", "1; mode=block")
@@ -48,22 +47,22 @@ func HumanDate(t time.Time) string {
 }
 
 // addDefaultData adds data for all templates
-func addDefaultData(dt *templates.TemplateData, r *http.Request) *templates.TemplateData {
+func addDefaultData(dt *data.TemplateData, r *http.Request) *data.TemplateData {
 	if dt == nil {
-		dt = &templates.TemplateData{}
+		dt = &data.TemplateData{}
 	}
 	dt.CurrentYear = time.Now().Year()
 
 	return dt
 }
 
-// render renders a HTML page to the client.
-func render(e *env.Env, w http.ResponseWriter, r *http.Request, tmpl string, data interface{}) error {
+// Render renders a HTML page to the client.
+func Render(e *env.Env, w http.ResponseWriter, r *http.Request, tmpl string, dt interface{}) error {
 	w.Header().Set("X-XSS-Protection", "1; mode=block")
 	w.Header().Set("X-Frame-Options", "deny")
 	w.Header().Set("X-Content-Type-Options", "nosniff")
-	switch d := data.(type) {
-	case *templates.TemplateData:
+	switch d := dt.(type) {
+	case *data.TemplateData:
 		ts, ok := e.TemplateCache[tmpl]
 		if !ok {
 			return StatusError{fmt.Errorf("Error: no HTML template for available for %s", tmpl), http.StatusInternalServerError}
@@ -86,32 +85,4 @@ func render(e *env.Env, w http.ResponseWriter, r *http.Request, tmpl string, dat
 		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
 	}
 	return nil
-}
-
-// neuteredFileSystem is a custom file system to disable directory listings.
-type neuteredFileSystem struct {
-	fs http.FileSystem
-}
-
-// Open opens the files from the custom file system.
-func (nfs neuteredFileSystem) Open(path string) (http.File, error) {
-	f, err := nfs.fs.Open(path)
-	if err != nil {
-		return nil, err
-	}
-
-	s, err := f.Stat()
-	if s.IsDir() {
-		index := filepath.Join(path, "index.html")
-		if _, err := nfs.fs.Open(index); err != nil {
-			closeErr := f.Close()
-			if closeErr != nil {
-				return nil, closeErr
-			}
-
-			return nil, err
-		}
-	}
-
-	return f, nil
 }

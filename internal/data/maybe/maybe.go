@@ -1,11 +1,6 @@
 package maybe
 
 import (
-	"database/sql"
-	"strings"
-	"time"
-
-	"github.com/google/uuid"
 	"github.com/jmoiron/sqlx"
 	"github.com/pkg/errors"
 )
@@ -35,4 +30,22 @@ type Repo interface {
 // New returns a pointer to a book repo.
 func New(db *sqlx.DB) *RepositoryDb {
 	return &RepositoryDb{Db: db}
+}
+
+// Query retrieves all maybes from the database.
+func (r *RepositoryDb) Query() (Infos, error) {
+	const q = `
+	SELECT
+		m.*,
+		u.user_id AS user_id
+	FROM maybes as m
+	LEFT JOIN
+		users AS u ON m.user_id = u.user_id
+	ORDER BY m.maybe_id
+	`
+	var maybes Infos
+	if err := r.Db.Select(&maybes, q); err != nil {
+		return maybes, errors.Wrap(err, "selecting maybes")
+	}
+	return maybes, nil
 }

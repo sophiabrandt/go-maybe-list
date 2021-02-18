@@ -3,6 +3,7 @@ package web
 
 import (
 	"net/http"
+	"path/filepath"
 
 	"github.com/sophiabrandt/go-maybe-list/internal/env"
 )
@@ -36,14 +37,14 @@ func (se StatusError) Status() int {
 	return se.Code
 }
 
-// handler takes a configured Env.
-type handler struct {
+// Handler takes a configured Env.
+type Handler struct {
 	E *env.Env
 	H func(E *env.Env, w http.ResponseWriter, r *http.Request) error
 }
 
 // ServeHTTP allows the Handler to satisy the http.Handler interface.
-func (h handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+func (h Handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	err := h.H(h.E, w, r)
 	if err != nil {
 		switch e := err.(type) {
@@ -52,23 +53,51 @@ func (h handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 			// HTTP status code.
 			h.E.Log.Printf("HTTP %d - %s", e.Status(), e)
 			response := ErrorResponse{e.Error(), nil}
-			respond(h.E, w, response, e.Status())
+			Respond(h.E, w, response, e.Status())
 		default:
 			// Any error types we don't specifically look out for default
 			// to serving a HTTP 500
 			response := ErrorResponse{http.StatusText(http.StatusInternalServerError), nil}
 			h.E.Log.Printf("%s", e)
-			respond(h.E, w, response, http.StatusInternalServerError)
+			Respond(h.E, w, response, http.StatusInternalServerError)
 		}
 	}
 }
 
-// use wraps middleware around handlers.
-func use(h handler, middleware ...func(http.Handler) http.Handler) http.Handler {
+// Use wraps middleware around handlers.
+func Use(h Handler, middleware ...func(http.Handler) http.Handler) http.Handler {
 	var res http.Handler = h
 	for _, m := range middleware {
 		res = m(res)
 	}
 
 	return res
+}
+
+// NeuteredFileSystem is a custom file system to disable directory listings.
+type NeuteredFileSystem struct {
+	Fs http.FileSystem
+}
+
+// Open opens the files from the custom file system.
+func (nfs NeuteredFileSystem) Open(path string) (http.File, error) {
+	f, err := nfs.Fs.Open(path)
+	if err != nil {
+		return nil, err
+	}
+
+	s, err := f.Stat()
+	if s.IsDir() {
+		index := filepath.Join(path, "index.html")
+		if _, err := nfs.Fs.Open(index); err != nil {
+			closeErr := f.Close()
+			if closeErr != nil {
+				return nil, closeErr
+			}
+
+			return nil, err
+		}
+	}
+
+	return f, nil
 }

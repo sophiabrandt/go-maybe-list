@@ -14,7 +14,7 @@ import (
 	"github.com/sophiabrandt/go-maybe-list/internal/adapter/database"
 	"github.com/sophiabrandt/go-maybe-list/internal/env"
 	"github.com/sophiabrandt/go-maybe-list/internal/server"
-	"github.com/sophiabrandt/go-maybe-list/internal/web"
+	"github.com/sophiabrandt/go-maybe-list/internal/web/handlers"
 	"github.com/sophiabrandt/go-maybe-list/internal/web/templates"
 )
 
@@ -58,7 +58,7 @@ func run(ctx context.Context, log *log.Logger) error {
 
 	env := env.New(log, db, tc)
 
-	router := web.NewRouter(env)
+	router := handlers.New(env)
 
 	// create server
 	srv := server.New(*addr, router)
