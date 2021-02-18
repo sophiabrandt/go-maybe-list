@@ -1,0 +1,15 @@
+version: '2.4'
+
+services:
+  app:
+    build:
+      context: .
+      dockerfile: ./docker/app/Dockerfile
+    ports:
+      - 4000:4000
+    healthcheck:
+      test: ["CMD", "curl", "-f", "0.0.0.0:4000/debug/liveness"]
+      interval: 3s
+      start_period: 10s
+      timeout: 4s
+      retries: 10
