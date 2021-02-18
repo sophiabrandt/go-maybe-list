@@ -10,7 +10,9 @@ import (
 	"syscall"
 	"time"
 
+	"github.com/sophiabrandt/go-maybe-list/internal/env"
 	"github.com/sophiabrandt/go-maybe-list/internal/server"
+	"github.com/sophiabrandt/go-maybe-list/internal/web"
 )
 
 func main() {
@@ -41,7 +43,10 @@ func run(ctx context.Context, log *log.Logger) error {
 	addr := flag.String("addr", "0.0.0.0:4000", "Http network address")
 	flag.Parse()
 
-	router := http.NewServeMux()
+	// initialize global dependencies
+	env := env.New(log)
+
+	router := web.NewRouter(env)
 
 	// create server
 	srv := server.New(*addr, router)
