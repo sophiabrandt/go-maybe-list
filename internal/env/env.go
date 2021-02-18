@@ -4,6 +4,8 @@ import (
 	"html/template"
 	"log"
 
+	"github.com/jmoiron/sqlx"
+
 	"github.com/dimfeld/httptreemux/v5"
 )
 
@@ -11,15 +13,17 @@ import (
 // dependencies.
 type Env struct {
 	Log           *log.Logger
+	Db            *sqlx.DB
 	Router        *httptreemux.ContextMux
 	TemplateCache map[string]*template.Template
 }
 
 // New creates a new pointer to an Env struct.
-func New(log *log.Logger, templateCache map[string]*template.Template) *Env {
+func New(log *log.Logger, db *sqlx.DB, templateCache map[string]*template.Template) *Env {
 	router := httptreemux.NewContextMux()
 	return &Env{
 		Log:           log,
+		Db:            db,
 		Router:        router,
 		TemplateCache: templateCache,
 	}

@@ -10,6 +10,8 @@ import (
 	"syscall"
 	"time"
 
+	"github.com/pkg/errors"
+	"github.com/sophiabrandt/go-maybe-list/internal/adapter/database"
 	"github.com/sophiabrandt/go-maybe-list/internal/env"
 	"github.com/sophiabrandt/go-maybe-list/internal/server"
 	"github.com/sophiabrandt/go-maybe-list/internal/web"
@@ -44,10 +46,17 @@ func run(ctx context.Context, log *log.Logger) error {
 	addr := flag.String("addr", "0.0.0.0:4000", "Http network address")
 	flag.Parse()
 
+	// database
+	db, err := database.New()
+	if err != nil {
+		return errors.Wrap(err, "could not start server")
+	}
+	defer db.Close()
+
 	// initialize global dependencies
 	tc, err := templates.NewCache("./ui/html")
 
-	env := env.New(log, tc)
+	env := env.New(log, db, tc)
 
 	router := web.NewRouter(env)
 
