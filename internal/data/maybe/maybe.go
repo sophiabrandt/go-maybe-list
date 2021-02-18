@@ -52,6 +52,7 @@ func (r *RepositoryDb) Query() (Infos, error) {
 	}
 	return maybes, nil
 }
+
 // QuerybyID retrieves a book by ID from the database.
 func (r *RepositoryDb) QueryByID(id string) (Info, error) {
 	if _, err := uuid.Parse(id); err != nil {

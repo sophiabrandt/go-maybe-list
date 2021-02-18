@@ -15,6 +15,7 @@ import (
 	"github.com/sophiabrandt/go-maybe-list/internal/env"
 	"github.com/sophiabrandt/go-maybe-list/internal/server"
 	"github.com/sophiabrandt/go-maybe-list/internal/web/handlers"
+	"github.com/sophiabrandt/go-maybe-list/internal/web/session"
 	"github.com/sophiabrandt/go-maybe-list/internal/web/templates"
 )
 
@@ -44,6 +45,7 @@ func run(ctx context.Context, log *log.Logger) error {
 	log.Println("main : Started : Application initializing")
 
 	addr := flag.String("addr", "0.0.0.0:4000", "Http network address")
+	secret := flag.String("secret", "60FNA&6bdH+FnhG306I6MNCY8bv_WjwDcjB", "Secret key")
 	flag.Parse()
 
 	// database
@@ -55,8 +57,9 @@ func run(ctx context.Context, log *log.Logger) error {
 
 	// initialize global dependencies
 	tc, err := templates.NewCache("./ui/html")
+	ses := session.New(*secret)
 
-	env := env.New(log, db, tc)
+	env := env.New(log, db, tc, ses)
 
 	router := handlers.New(env)
 

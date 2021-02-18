@@ -1,4 +1,5 @@
 // https://blog.questionable.services/article/guide-logging-middleware-go/
+// https://lets-go.alexedwards.net/
 package middleware
 
 import (
@@ -36,8 +37,7 @@ func (rw *responseWriter) WriteHeader(code int) {
 	return
 }
 
-// RequestLogger logs the incoming HTTP request & its duration.
-func RequestLogger(log *log.Logger) func(http.Handler) http.Handler {
+func LogRequest(log *log.Logger) func(http.Handler) http.Handler {
 	return func(next http.Handler) http.Handler {
 		fn := func(w http.ResponseWriter, r *http.Request) {
 			defer func() {
@@ -59,4 +59,19 @@ func RequestLogger(log *log.Logger) func(http.Handler) http.Handler {
 
 		return http.HandlerFunc(fn)
 	}
+}
+
+func RecoverPanic(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		defer func() {
+			if err := recover(); err != nil {
+				// Set a "Connection: close" header on the response.
+				w.Header().Set("Connection", "close")
+				// return internal server error
+				http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+			}
+		}()
+
+		next.ServeHTTP(w, r)
+	})
 }
