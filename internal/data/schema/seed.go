@@ -30,9 +30,9 @@ func Seed(db *sqlx.DB) error {
 // may need to be broken up.
 const seeds = `
 -- Create users, maybes and tags
-INSERT INTO users (user_id, name, email, password_hash, created_at, updated_at) VALUES
-	('bbc79841-7feb-4944-9971-07404558dfdd', 'user1', 'user1@email.com', '$2a$10$1ggfMVZV6Js0ybvJufLRUOWHS5f6KneuP0XwwHpJ8L8ipdry9f2/a', '2019-01-01 00:00:03.000001+00', '2019-01-01 00:00:03.000001+00'),
-	('6ae4a9bf-0bff-40d5-9dbc-ce93819f4208', 'user2', 'user2@email.com', '$2a$10$9/XASPKBbJKVfCAZKDH.UuhsuALDr5vVm6VrYA9VFR8rccK86C1hW', '2019-01-01 00:00:03.000001+00', '2019-01-01 00:00:03.000001+00')
+INSERT INTO users (user_id, name, email, password_hash, active, created_at, updated_at) VALUES
+	('bbc79841-7feb-4944-9971-07404558dfdd', 'user1', 'user1@email.com', '$2a$10$1ggfMVZV6Js0ybvJufLRUOWHS5f6KneuP0XwwHpJ8L8ipdry9f2/a', 'true', '2019-01-01 00:00:03.000001+00', '2019-01-01 00:00:03.000001+00'),
+	('6ae4a9bf-0bff-40d5-9dbc-ce93819f4208', 'user2', 'user2@email.com', '$2a$10$9/XASPKBbJKVfCAZKDH.UuhsuALDr5vVm6VrYA9VFR8rccK86C1hW', 'true', '2019-01-01 00:00:03.000001+00', '2019-01-01 00:00:03.000001+00')
 	ON CONFLICT DO NOTHING;
 
 INSERT INTO tags (tag_id, name) VALUES

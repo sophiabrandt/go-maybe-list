@@ -6,6 +6,7 @@ type Info struct {
 	Name         string `db:"name"`
 	Email        string `db:"email"`
 	PasswordHash []byte `db:"password_hash"`
+	Active       bool   `db:"active"`
 	DateCreated  string `db:"created_at"`
 	DateUpdated  string `db:"updated_at"`
 }

@@ -37,7 +37,7 @@ func (ug userGroup) signup(e *env.Env, w http.ResponseWriter, r *http.Request) e
 		}
 	}
 
-	http.Redirect(w, r, "/", http.StatusSeeOther)
+	http.Redirect(w, r, "/maybes", http.StatusSeeOther)
 	return nil
 }
 

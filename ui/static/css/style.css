@@ -197,7 +197,7 @@ textarea {
   background-color: var(--color-flash);
 }
 
-div .error {
+div.error {
   color: #f1faee;
   font-weight: bold;
   text-align: center;

@@ -29,23 +29,24 @@ var migrations = []darwin.Migration{
 		Script: `
 -- Create users
 CREATE TABLE users (
-	user_id       UUID,
+	user_id       UUID NOT NULL,
 	name          TEXT NOT NULL,
 	email         TEXT NOT NULL UNIQUE,
 	password_hash TEXT NOT NULL,
-	created_at    TIMESTAMP,
-	updated_at    TIMESTAMP,
+	active        BOOLEAN NOT NULL DEFAULT TRUE,
+	created_at    TIMESTAMP NOT NULL,
+	updated_at    TIMESTAMP NOT NULL,
 PRIMARY KEY (user_id)
 );
 -- Create maybes
 CREATE TABLE maybes (
-	maybe_id       UUID,
+	maybe_id       UUID NOT NULL,
 	user_id        UUID,
 	title          TEXT NOT NULL,
-	url            TEXT,
-	description    TEXT,
-	created_at     TIMESTAMP,
-	updated_at     TIMESTAMP,
+	url            TEXT NOT NULL,
+	description    TEXT NOT NULL,
+	created_at     TIMESTAMP NOT NULL,
+	updated_at     TIMESTAMP NOT NULL,
 PRIMARY KEY (maybe_id),
 -- One-to-many relationship between users and maybes
 FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE
@@ -54,8 +55,8 @@ FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE
 CREATE UNIQUE INDEX idx_maybe_title ON maybes(title);
 -- Create tags
 CREATE TABLE tags (
-	tag_id         UUID,
-	name           TEXT
+	tag_id         UUID NOT NULL,
+	name           TEXT NOT NULL
 );
 -- Linking table for many-to-many relationship between Tag and Maybe
 CREATE TABLE maybetags (

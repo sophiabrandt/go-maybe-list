@@ -54,6 +54,7 @@ func (r *RepositoryDb) Create(user NewUser) (Info, error) {
 		ID:           uuid.New().String(),
 		Name:         user.Name,
 		Email:        user.Email,
+		Active:       true,
 		PasswordHash: hash,
 		DateCreated:  time.Now().UTC().String(),
 		DateUpdated:  time.Now().UTC().String(),
@@ -61,11 +62,11 @@ func (r *RepositoryDb) Create(user NewUser) (Info, error) {
 
 	const q = `
 	INSERT INTO users
-		(user_id, name, email, password_hash, created_at, updated_at)
+		(user_id, name, email, password_hash, active, created_at, updated_at)
 	VALUES
-		($1, $2, $3, $4, $5, $6)`
+		($1, $2, $3, $4, $5, $6, $7)`
 
-	if _, err = r.Db.Exec(q, usr.ID, usr.Name, usr.Email, usr.PasswordHash, usr.DateCreated, usr.DateUpdated); err != nil {
+	if _, err = r.Db.Exec(q, usr.ID, usr.Name, usr.Email, usr.PasswordHash, usr.Active, usr.DateCreated, usr.DateUpdated); err != nil {
 		var sqLiteError *sqlite.Error
 		if errors.As(err, &sqLiteError) {
 			if sqLiteError.Code() == 2067 && strings.Contains(sqLiteError.Error(), "users.email") {
@@ -88,6 +89,8 @@ func (r *RepositoryDb) Authenticate(email, password string) (string, error) {
 		users
 	WHERE 
 		email = $1
+	AND
+		active = TRUE
 	`
 	row := r.Db.QueryRowx(q, email)
 	err := row.Scan(&id, &hash)
