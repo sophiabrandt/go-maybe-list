@@ -42,7 +42,10 @@ func (ug userGroup) signup(e *env.Env, w http.ResponseWriter, r *http.Request) e
 }
 
 func (ug userGroup) logout(e *env.Env, w http.ResponseWriter, r *http.Request) error {
-	return web.Render(e, w, r, "signup.page.tmpl", &data.TemplateData{}, http.StatusOK)
+	e.Session.Remove(r, "authenticatedUserID")
+	e.Session.Put(r, "flash", "You've been logged out successfully!")
+	http.Redirect(w, r, "/", http.StatusSeeOther)
+	return nil
 }
 
 func (ug userGroup) loginForm(e *env.Env, w http.ResponseWriter, r *http.Request) error {
