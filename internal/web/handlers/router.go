@@ -27,8 +27,8 @@ func New(e *env.Env) http.Handler {
 		maybe: maybe.New(e.Db),
 	}
 	r.Handler(http.MethodGet, "/", dynamicMiddleware.Then(web.Handler{e, mg.getAllMaybes}))
-	r.Handler(http.MethodGet, "/maybes", dynamicMiddleware.Then(web.Handler{e, mg.getMaybesQueryFilter}))
-	r.Handler(http.MethodGet, "/maybes/:id", dynamicMiddleware.Then(web.Handler{e, mg.getMaybeByID}))
+	r.Handler(http.MethodGet, "/maybes", dynamicMiddleware.Append(middleware.RequireAuthentication(e)).Then(web.Handler{e, mg.getMaybesQueryFilter}))
+	r.Handler(http.MethodGet, "/maybes/:id", dynamicMiddleware.Append(middleware.RequireAuthentication(e)).Then(web.Handler{e, mg.getMaybeByID}))
 
 	// user
 	ug := userGroup{

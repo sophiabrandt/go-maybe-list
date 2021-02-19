@@ -9,6 +9,8 @@ import (
 	"time"
 
 	"github.com/pkg/errors"
+	"github.com/sophiabrandt/go-maybe-list/internal/env"
+	"github.com/sophiabrandt/go-maybe-list/internal/web/web"
 )
 
 // responseWriter is a minimal wrapper for http.ResponseWriter that allows the
@@ -96,4 +98,27 @@ func SecureHeaders(next http.Handler) http.Handler {
 
 		next.ServeHTTP(w, r)
 	})
+}
+
+// RequireAuthentication checks if an authenticatedUserID exists on the request.
+func RequireAuthentication(e *env.Env) func(http.Handler) http.Handler {
+	return func(next http.Handler) http.Handler {
+		fn := func(w http.ResponseWriter, r *http.Request) {
+			if !web.IsAuthenticated(e, r) {
+				// add path that the user is trying to access to session data
+				e.Session.Put(r, "redirectPathAfterLogin", r.URL.Path)
+				// redirect to login
+				http.Redirect(w, r, "/users/login", http.StatusSeeOther)
+				return
+			}
+
+			// Set the "Cache-Control: no-store" header so that pages
+			// require authentication are not stored in the users browser cache (or
+			// other intermediary cache).
+			w.Header().Add("Cache-Control", "no-store")
+
+			next.ServeHTTP(w, r)
+		}
+		return http.HandlerFunc(fn)
+	}
 }

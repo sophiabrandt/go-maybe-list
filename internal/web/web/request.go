@@ -59,8 +59,8 @@ func Params(r *http.Request) map[string]string {
 	return httptreemux.ContextParams(r.Context())
 }
 
-// isAuthenticated checks the current request for an authenticated user.
-func isAuthenticated(e *env.Env, r *http.Request) bool {
+// IsAuthenticated checks the current request for an authenticated user.
+func IsAuthenticated(e *env.Env, r *http.Request) bool {
 	return e.Session.Exists(r, "authenticatedUserID")
 }
 
