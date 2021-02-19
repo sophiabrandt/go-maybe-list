@@ -5,7 +5,9 @@ import (
 	"fmt"
 	"net/http"
 	"reflect"
+	"regexp"
 	"strings"
+	"unicode"
 
 	"github.com/go-playground/form/v4"
 
@@ -16,6 +18,10 @@ import (
 
 // validate holds the settings and caches for validating request struct values.
 var validate *validator.Validate
+
+const (
+	dateRegexString string = "^(((19|20)([2468][048]|[13579][26]|0[48])|2000)[/-]02[/-]29|((19|20)[0-9]{2}[/-](0[469]|11)[/-](0[1-9]|[12][0-9]|30)|(19|20)[0-9]{2}[/-](0[13578]|1[02])[/-](0[1-9]|[12][0-9]|3[01])|(19|20)[0-9]{2}[/-]02[/-](0[1-9]|1[0-9]|2[0-8])))$"
+)
 
 // NewValidator returns a pointer to a validator.
 func NewValidator() *validator.Validate {
@@ -30,6 +36,9 @@ func NewValidator() *validator.Validate {
 		}
 		return name
 	})
+
+	validate.RegisterValidation("date", isDate)
+	validate.RegisterValidation("secure_password", isSecurePassword)
 
 	return validate
 }
@@ -86,7 +95,11 @@ func DecodeForm(r *http.Request, val interface{}) (*forms.Form, error) {
 			case "email":
 				form.Errors.Add(verror.Field(), fmt.Sprintf("%s must be a valid Email", verror.Field()))
 			case "eqfield":
-				form.Errors.Add(verror.Field(), fmt.Sprintf("%s must be equal to %s", verror.Field(), verror.Tag()))
+				form.Errors.Add(verror.Field(), fmt.Sprintf("%s must be equal to %s", verror.Field(), verror.Param()))
+			case "secure_password":
+				form.Errors.Add(verror.Field(), fmt.Sprintf("%s must be at least 8 characters, contain at least 1 uppercase letter, at least 1 lowercase letter, at least 1 special character and at least 1 number", verror.Field()))
+			case "date":
+				form.Errors.Add(verror.Field(), fmt.Sprintf("%s must be a valid date", verror.Field()))
 			default:
 				form.Errors.Add(verror.Field(), fmt.Sprintf("something wrong on %s; %s", verror.Field(), verror.Tag()))
 			}
@@ -95,4 +108,42 @@ func DecodeForm(r *http.Request, val interface{}) (*forms.Form, error) {
 	}
 
 	return form, nil
+}
+
+func isDate(fl validator.FieldLevel) bool {
+	reg := regexp.MustCompile(dateRegexString)
+	return reg.MatchString(fl.Field().String())
+}
+
+// http://www.inanzzz.com/index.php/post/8l1a/validating-user-password-in-golang-requests
+func isSecurePassword(fl validator.FieldLevel) bool {
+	var (
+		upp, low, num, sym bool
+		tot                uint8
+	)
+
+	for _, char := range fl.Field().String() {
+		switch {
+		case unicode.IsUpper(char):
+			upp = true
+			tot++
+		case unicode.IsLower(char):
+			low = true
+			tot++
+		case unicode.IsNumber(char):
+			num = true
+			tot++
+		case unicode.IsPunct(char) || unicode.IsSymbol(char):
+			sym = true
+			tot++
+		default:
+			return false
+		}
+	}
+
+	if !upp || !low || !num || !sym || tot < 8 {
+		return false
+	}
+
+	return true
 }

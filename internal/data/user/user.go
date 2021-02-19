@@ -20,7 +20,7 @@ var (
 	ErrInvalidID = errors.New("ID is not in its proper form")
 
 	// ErrDuplicateEmail occus when the email exists in the database.
-	ErrDuplicateEmail = errors.New("Invalid email or email already in use")
+	ErrDuplicateEmail = errors.New("email already in use")
 )
 
 // RepositoryDb defines the repository for the book service.
