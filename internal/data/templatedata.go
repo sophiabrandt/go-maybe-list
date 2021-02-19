@@ -7,9 +7,10 @@ import (
 
 // TemplateData is all data needed for Golang HTML templates.
 type TemplateData struct {
-	Maybe       *maybe.Info
-	Maybes      maybe.Infos
-	Form        *forms.Form
-	Flash       string
-	CurrentYear int
+	Maybe           *maybe.Info
+	Maybes          maybe.Infos
+	Form            *forms.Form
+	Flash           string
+	CurrentYear     int
+	IsAuthenticated bool
 }

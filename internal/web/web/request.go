@@ -13,6 +13,7 @@ import (
 
 	"github.com/dimfeld/httptreemux/v5"
 	"github.com/go-playground/validator/v10"
+	"github.com/sophiabrandt/go-maybe-list/internal/env"
 	"github.com/sophiabrandt/go-maybe-list/internal/web/forms"
 )
 
@@ -56,6 +57,11 @@ func Decode(r *http.Request, val interface{}) error {
 // Params returns the web call parameters from the request.
 func Params(r *http.Request) map[string]string {
 	return httptreemux.ContextParams(r.Context())
+}
+
+// isAuthenticated checks the current request for an authenticated user.
+func isAuthenticated(e *env.Env, r *http.Request) bool {
+	return e.Session.Exists(r, "authenticatedUserID")
 }
 
 // DecodeForm parses incoming form data and validates it.

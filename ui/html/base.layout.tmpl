@@ -17,11 +17,14 @@
       <nav class="wrapper cluster nav__content">
         <div>
           <a href="/">Home</a>
-          <a href="/users/signup">Signup</a>
-          <a href="/users/login">Login</a>
+          {{if .IsAuthenticated}}
           <form action='/users/logout' method='POST'>
               <button>Logout</button>
           </form>
+          {{else}}
+          <a href="/users/signup">Signup</a>
+          <a href="/users/login">Login</a>
+          {{end}}
         </div>
       </nav>
       <main class="wrapper stack main__content">
