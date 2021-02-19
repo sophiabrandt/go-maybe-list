@@ -1,11 +1,11 @@
 package handlers
 
 import (
+	"encoding/json"
 	"net/http"
 
 	"github.com/sophiabrandt/go-maybe-list/internal/adapter/database"
 	"github.com/sophiabrandt/go-maybe-list/internal/env"
-	"github.com/sophiabrandt/go-maybe-list/internal/web"
 )
 
 // health checks if the service is available and database is up.
@@ -20,5 +20,8 @@ func health(e *env.Env, w http.ResponseWriter, r *http.Request) error {
 		Status string `json:"status`
 	}{Status: status}
 
-	return web.Respond(e, w, health, statusCode)
+	// Write the status code to the response.
+	w.WriteHeader(statusCode)
+	json.NewEncoder(w).Encode(health)
+	return nil
 }

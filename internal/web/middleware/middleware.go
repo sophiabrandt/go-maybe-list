@@ -7,6 +7,8 @@ import (
 	"net/http"
 	"runtime/debug"
 	"time"
+
+	"github.com/pkg/errors"
 )
 
 // responseWriter is a minimal wrapper for http.ResponseWriter that allows the
@@ -37,6 +39,7 @@ func (rw *responseWriter) WriteHeader(code int) {
 	return
 }
 
+// LogRequest logs information about each request.
 func LogRequest(log *log.Logger) func(http.Handler) http.Handler {
 	return func(next http.Handler) http.Handler {
 		fn := func(w http.ResponseWriter, r *http.Request) {
@@ -44,7 +47,7 @@ func LogRequest(log *log.Logger) func(http.Handler) http.Handler {
 				if err := recover(); err != nil {
 					w.WriteHeader(http.StatusInternalServerError)
 					log.Printf(
-						"error: %s, trace: %s", err, debug.Stack(),
+						"ERROR: %s, trace: %s", err, debug.Stack(),
 					)
 				}
 			}()
@@ -61,16 +64,35 @@ func LogRequest(log *log.Logger) func(http.Handler) http.Handler {
 	}
 }
 
-func RecoverPanic(next http.Handler) http.Handler {
+// RecoverPanic closes a connection and returns an error response.
+func RecoverPanic(log *log.Logger) func(http.Handler) http.Handler {
+	return func(next http.Handler) http.Handler {
+		fn := func(w http.ResponseWriter, r *http.Request) {
+			defer func() {
+				if r := recover(); r != nil {
+					err := errors.Errorf("%v", r)
+					log.Printf(
+						"PANIC: %s, trace: %s", err, debug.Stack(),
+					)
+					// Set a "Connection: close" header on the response.
+					w.Header().Set("Connection", "close")
+					// return internal server error
+					http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+				}
+			}()
+
+			next.ServeHTTP(w, r)
+		}
+		return http.HandlerFunc(fn)
+	}
+}
+
+// SecureHeaders sets header options.
+func SecureHeaders(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		defer func() {
-			if err := recover(); err != nil {
-				// Set a "Connection: close" header on the response.
-				w.Header().Set("Connection", "close")
-				// return internal server error
-				http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
-			}
-		}()
+		w.Header().Set("X-XSS-Protection", "1; mode=block")
+		w.Header().Set("X-Frame-Options", "deny")
+		w.Header().Set("X-Content-Type-Options", "nosniff")
 
 		next.ServeHTTP(w, r)
 	})

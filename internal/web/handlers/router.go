@@ -6,13 +6,13 @@ import (
 	"github.com/justinas/alice"
 	"github.com/sophiabrandt/go-maybe-list/internal/data/maybe"
 	"github.com/sophiabrandt/go-maybe-list/internal/env"
-	"github.com/sophiabrandt/go-maybe-list/internal/web"
 	"github.com/sophiabrandt/go-maybe-list/internal/web/middleware"
+	"github.com/sophiabrandt/go-maybe-list/internal/web/web"
 )
 
 // New creates a new router with all application routes.
 func New(e *env.Env) http.Handler {
-	standardMiddleware := alice.New(middleware.RecoverPanic, middleware.LogRequest(e.Log))
+	standardMiddleware := alice.New(middleware.SecureHeaders, middleware.LogRequest(e.Log), middleware.RecoverPanic(e.Log))
 
 	dynamicMiddleware := alice.New(e.Session.Enable)
 

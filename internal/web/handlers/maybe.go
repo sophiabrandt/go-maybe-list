@@ -8,7 +8,7 @@ import (
 	"github.com/sophiabrandt/go-maybe-list/internal/data"
 	"github.com/sophiabrandt/go-maybe-list/internal/data/maybe"
 	"github.com/sophiabrandt/go-maybe-list/internal/env"
-	"github.com/sophiabrandt/go-maybe-list/internal/web"
+	"github.com/sophiabrandt/go-maybe-list/internal/web/web"
 )
 
 type maybeGroup struct {
@@ -18,7 +18,7 @@ type maybeGroup struct {
 func (mg maybeGroup) getAllMaybes(e *env.Env, w http.ResponseWriter, r *http.Request) error {
 	maybes, err := mg.maybe.Query()
 	if err != nil {
-		return web.Render(e, w, r, "", err, http.StatusInternalServerError)
+		return web.StatusError{Err: err, Code: http.StatusInternalServerError}
 	}
 
 	return web.Render(e, w, r, "home.page.tmpl", &data.TemplateData{Maybes: maybes}, http.StatusOK)
@@ -27,13 +27,13 @@ func (mg maybeGroup) getAllMaybes(e *env.Env, w http.ResponseWriter, r *http.Req
 func (mg maybeGroup) getMaybesQueryFilter(e *env.Env, w http.ResponseWriter, r *http.Request) error {
 	title, err := url.QueryUnescape(r.URL.Query().Get("title"))
 	if err != nil {
-		return web.Render(e, w, r, "", err, http.StatusBadRequest)
+		return web.StatusError{Err: err, Code: http.StatusBadRequest}
 	}
 	maybes, err := mg.maybe.QueryByTitle(title)
 	if err != nil {
 		switch errors.Cause(err) {
 		case maybe.ErrNotFound:
-			return web.Render(e, w, r, "", err, http.StatusNotFound)
+			return web.StatusError{Err: err, Code: http.StatusNotFound}
 		default:
 			return errors.Wrapf(err, "Title : %s", title)
 		}
@@ -49,9 +49,9 @@ func (mg maybeGroup) getMaybeByID(e *env.Env, w http.ResponseWriter, r *http.Req
 	if err != nil {
 		switch errors.Cause(err) {
 		case maybe.ErrInvalidID:
-			return web.Render(e, w, r, "", err, http.StatusBadRequest)
+			return web.StatusError{Err: err, Code: http.StatusBadRequest}
 		case maybe.ErrNotFound:
-			return web.Render(e, w, r, "", err, http.StatusNotFound)
+			return web.StatusError{Err: err, Code: http.StatusNotFound}
 		default:
 			return errors.Wrapf(err, "ID : %s", params["id"])
 		}

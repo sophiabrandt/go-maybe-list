@@ -15,12 +15,6 @@ type Error interface {
 	Status() int
 }
 
-// ErrorResponse is the client response struct for errors.
-type ErrorResponse struct {
-	Error  string   `json:"error"`
-	Fields []string `json:"fields,omitempty"`
-}
-
 // StatusError represents an error with an associated HTTP status code.
 type StatusError struct {
 	Err  error
@@ -52,26 +46,14 @@ func (h Handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 			// We can retrieve the status here and write out a specific
 			// HTTP status code.
 			h.E.Log.Printf("HTTP %d - %s", e.Status(), e)
-			response := ErrorResponse{e.Error(), nil}
-			Respond(h.E, w, response, e.Status())
+			Render(h.E, w, r, "", e, e.Status())
 		default:
 			// Any error types we don't specifically look out for default
 			// to serving a HTTP 500
-			response := ErrorResponse{http.StatusText(http.StatusInternalServerError), nil}
-			h.E.Log.Printf("%s", e)
-			Respond(h.E, w, response, http.StatusInternalServerError)
+			h.E.Log.Printf("HTTP 500 - %s", e)
+			Render(h.E, w, r, "", http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
 		}
 	}
-}
-
-// Use wraps middleware around handlers.
-func Use(h Handler, middleware ...func(http.Handler) http.Handler) http.Handler {
-	var res http.Handler = h
-	for _, m := range middleware {
-		res = m(res)
-	}
-
-	return res
 }
 
 // NeuteredFileSystem is a custom file system to disable directory listings.
