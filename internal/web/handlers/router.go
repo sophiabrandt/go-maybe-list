@@ -35,7 +35,10 @@ func New(e *env.Env) http.Handler {
 		user: user.New(e.Db),
 	}
 	r.Handler(http.MethodGet, "/users/signup", dynamicMiddleware.Then(web.Handler{e, ug.signupForm}))
+	r.Handler(http.MethodPost, "/users/signup", dynamicMiddleware.Then(web.Handler{e, ug.signup}))
 	r.Handler(http.MethodGet, "/users/login", dynamicMiddleware.Then(web.Handler{e, ug.loginForm}))
+	r.Handler(http.MethodPost, "/users/login", dynamicMiddleware.Then(web.Handler{e, ug.login}))
+	r.Handler(http.MethodPost, "/users/logout", dynamicMiddleware.Then(web.Handler{e, ug.logout}))
 
 	// fileServer
 	fileServer := http.FileServer(web.NeuteredFileSystem{http.Dir("./ui/static/")})

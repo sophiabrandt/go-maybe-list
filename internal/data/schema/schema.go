@@ -31,6 +31,10 @@ var migrations = []darwin.Migration{
 CREATE TABLE users (
 	user_id       UUID,
 	name          TEXT NOT NULL,
+	email         TEXT NOT NULL UNIQUE,
+	password_hash TEXT NOT NULL,
+	created_at    TIMESTAMP,
+	updated_at    TIMESTAMP,
 PRIMARY KEY (user_id)
 );
 -- Create maybes

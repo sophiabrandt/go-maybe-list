@@ -1,6 +1,13 @@
 package user
 
 import (
+	"strings"
+	"time"
+
+	"golang.org/x/crypto/bcrypt"
+	"modernc.org/sqlite"
+
+	"github.com/google/uuid"
 	"github.com/jmoiron/sqlx"
 	"github.com/pkg/errors"
 )
@@ -11,6 +18,9 @@ var (
 
 	// ErrInvalidID occurs when an ID is not in a valid form.
 	ErrInvalidID = errors.New("ID is not in its proper form")
+
+	// ErrDuplicateEmail occus when the email exists in the database.
+	ErrDuplicateEmail = errors.New("Invalid email or email already in use")
 )
 
 // RepositoryDb defines the repository for the book service.
@@ -19,9 +29,45 @@ type RepositoryDb struct {
 }
 
 // Repo is the interface for the maybe repository.
-type Repo interface{}
+type Repo interface {
+	Create(user NewUser) (Info, error)
+}
 
 // New returns a pointer to a book repo.
 func New(db *sqlx.DB) *RepositoryDb {
 	return &RepositoryDb{Db: db}
+}
+
+func (r *RepositoryDb) Create(user NewUser) (Info, error) {
+	hash, err := bcrypt.GenerateFromPassword([]byte(user.Password), bcrypt.DefaultCost)
+	if err != nil {
+		return Info{}, errors.Wrap(err, "generating password hash")
+	}
+
+	usr := Info{
+		ID:           uuid.New().String(),
+		Name:         user.Name,
+		Email:        user.Email,
+		PasswordHash: hash,
+		DateCreated:  time.Now().UTC().String(),
+		DateUpdated:  time.Now().UTC().String(),
+	}
+
+	const q = `
+	INSERT INTO users
+		(user_id, name, email, password_hash, created_at, updated_at)
+	VALUES
+		($1, $2, $3, $4, $5, $6)`
+
+	if _, err = r.Db.Exec(q, usr.ID, usr.Name, usr.Email, usr.PasswordHash, usr.DateCreated, usr.DateUpdated); err != nil {
+		var sqLiteError *sqlite.Error
+		if errors.As(err, &sqLiteError) {
+			if sqLiteError.Code() == 2067 && strings.Contains(sqLiteError.Error(), "users.email") {
+				return Info{}, ErrDuplicateEmail
+			}
+		}
+		return Info{}, errors.Wrap(err, "inserting user")
+	}
+
+	return usr, nil
 }

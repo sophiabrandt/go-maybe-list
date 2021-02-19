@@ -8,8 +8,8 @@ type Info struct {
 	Url         string `db:"url"`
 	Description string `db:"description"`
 	Tags        []*Tag `db:"tags"`
-	CreatedDate string `db:"created_at"`
-	UpdatedDate string `db:"updated_at"`
+	DateCreated string `db:"created_at"`
+	DateUpdated string `db:"updated_at"`
 }
 
 // Tag is the model for a tag.

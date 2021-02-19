@@ -17,6 +17,7 @@ import (
 	"github.com/sophiabrandt/go-maybe-list/internal/web/handlers"
 	"github.com/sophiabrandt/go-maybe-list/internal/web/session"
 	"github.com/sophiabrandt/go-maybe-list/internal/web/templates"
+	"github.com/sophiabrandt/go-maybe-list/internal/web/web"
 )
 
 func main() {
@@ -57,9 +58,10 @@ func run(ctx context.Context, log *log.Logger) error {
 
 	// initialize global dependencies
 	tc, err := templates.NewCache("./ui/html")
+	val := web.NewValidator()
 	ses := session.New(*secret)
 
-	env := env.New(log, db, tc, ses)
+	env := env.New(log, db, tc, val, ses)
 
 	router := handlers.New(env)
 
