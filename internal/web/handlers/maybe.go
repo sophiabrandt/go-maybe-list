@@ -38,7 +38,6 @@ func (mg maybeGroup) getMaybesQueryFilter(e *env.Env, w http.ResponseWriter, r *
 			return errors.Wrapf(err, "Query Path: %s, Title: %s", r.URL.EscapedPath(), title)
 		}
 	}
-	e.Log.Printf("%+v", maybes)
 
 	return web.Render(e, w, r, "maybe.page.tmpl", &data.TemplateData{Maybes: maybes}, http.StatusOK)
 }

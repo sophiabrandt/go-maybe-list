@@ -1,6 +1,7 @@
 package user
 
 import (
+	"database/sql"
 	"strings"
 	"time"
 
@@ -21,6 +22,10 @@ var (
 
 	// ErrDuplicateEmail occus when the email exists in the database.
 	ErrDuplicateEmail = errors.New("email already in use")
+
+	// ErrAuthenticationFailure occurs when a user attempts to authenticate but
+	// anything goes wrong.
+	ErrAuthenticationFailure = errors.New("authentication failed")
 )
 
 // RepositoryDb defines the repository for the book service.
@@ -31,6 +36,7 @@ type RepositoryDb struct {
 // Repo is the interface for the maybe repository.
 type Repo interface {
 	Create(user NewUser) (Info, error)
+	Authenticate(user Info) (string, error)
 }
 
 // New returns a pointer to a book repo.
@@ -70,4 +76,35 @@ func (r *RepositoryDb) Create(user NewUser) (Info, error) {
 	}
 
 	return usr, nil
+}
+
+func (r *RepositoryDb) Authenticate(email, password string) (string, error) {
+	var id string
+	var hash []byte
+	const q = `
+	SELECT
+		user_id, password_hash
+	FROM
+		users
+	WHERE 
+		email = $1
+	`
+	row := r.Db.QueryRowx(q, email)
+	err := row.Scan(&id, &hash)
+	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return id, ErrAuthenticationFailure
+		}
+		return id, err
+	}
+	err = bcrypt.CompareHashAndPassword(hash, []byte(password))
+	if err != nil {
+		if errors.Is(err, bcrypt.ErrMismatchedHashAndPassword) {
+			return id, ErrAuthenticationFailure
+		} else {
+			return id, err
+		}
+	}
+
+	return id, nil
 }

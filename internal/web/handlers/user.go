@@ -50,5 +50,25 @@ func (ug userGroup) loginForm(e *env.Env, w http.ResponseWriter, r *http.Request
 }
 
 func (ug userGroup) login(e *env.Env, w http.ResponseWriter, r *http.Request) error {
-	return web.Render(e, w, r, "login.page.tmpl", &data.TemplateData{}, http.StatusOK)
+	err := r.ParseForm()
+	if err != nil {
+		return web.StatusError{Err: err, Code: http.StatusBadRequest}
+	}
+
+	form := forms.New(r.PostForm)
+	id, err := ug.user.Authenticate(form.Get("email"), form.Get("password"))
+	if err != nil {
+		switch errors.Cause(err) {
+		case user.ErrAuthenticationFailure:
+			form.Errors.Add("generic", "Email or Password is incorrect")
+			return web.Render(e, w, r, "login.page.tmpl", &data.TemplateData{Form: form}, http.StatusUnprocessableEntity)
+		default:
+			return errors.Wrap(err, "authenticationg")
+		}
+	}
+
+	e.Session.Put(r, "authenticatedUserID", id)
+
+	http.Redirect(w, r, "/maybes", http.StatusSeeOther)
+	return nil
 }

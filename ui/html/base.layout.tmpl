@@ -26,7 +26,9 @@
       </nav>
       <main class="wrapper stack main__content">
         {{with .Flash}}
-        <div class='flash '>{{.}}</div>
+         <div class="center flash__container">
+            <div class="flash">{{.}}</div>
+         </div>
         {{end}}
         {{template "main" .}}
       </main>

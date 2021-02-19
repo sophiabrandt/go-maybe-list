@@ -26,6 +26,15 @@
     --color-dark: #f1faee;
     --color-light: #290149;
   }
+  input[type="text"],
+  input[type="email"],
+  input[type="password"],
+  textarea {
+    background-color: var(--color-neutral);
+  }
+  input[type="submit"] {
+    color: var(--color-light);
+  }
 }
 
 :focus {
@@ -186,6 +195,15 @@ textarea {
   padding: 1rem;
   width: 100%;
   background-color: var(--color-flash);
+}
+
+div .error {
+  color: #f1faee;
+  font-weight: bold;
+  text-align: center;
+  padding: 1rem;
+  width: 100%;
+  background-color: var(--color-error);
 }
 
 .error {
