@@ -35,7 +35,7 @@ func (mg maybeGroup) getMaybesQueryFilter(e *env.Env, w http.ResponseWriter, r *
 		case maybe.ErrNotFound:
 			return web.StatusError{Err: err, Code: http.StatusNotFound}
 		default:
-			return errors.Wrapf(err, "Title : %s", title)
+			return errors.Wrapf(err, "Query Path: %s, Title: %s", r.URL.EscapedPath(), title)
 		}
 	}
 	e.Log.Printf("%+v", maybes)

@@ -16,7 +16,7 @@ var (
 	ErrInvalidID = errors.New("ID is not in its proper form")
 )
 
-// BookRepositoryDb defines the repository for the book service.
+// RepositoryDb defines the repository for the book service.
 type RepositoryDb struct {
 	Db *sqlx.DB
 }

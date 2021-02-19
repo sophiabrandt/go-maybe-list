@@ -5,6 +5,7 @@ import (
 
 	"github.com/justinas/alice"
 	"github.com/sophiabrandt/go-maybe-list/internal/data/maybe"
+	"github.com/sophiabrandt/go-maybe-list/internal/data/user"
 	"github.com/sophiabrandt/go-maybe-list/internal/env"
 	"github.com/sophiabrandt/go-maybe-list/internal/web/middleware"
 	"github.com/sophiabrandt/go-maybe-list/internal/web/web"
@@ -21,10 +22,6 @@ func New(e *env.Env) http.Handler {
 	// liveness check
 	r.Handler(http.MethodGet, "/debug/health", web.Handler{e, health})
 
-	// signup/register routes
-	r.Handler(http.MethodGet, "/signup", dynamicMiddleware.Then(web.Handler{e, signup}))
-	r.Handler(http.MethodGet, "/login", dynamicMiddleware.Then(web.Handler{e, login}))
-
 	// maybe routes
 	mg := maybeGroup{
 		maybe: maybe.New(e.Db),
@@ -32,6 +29,13 @@ func New(e *env.Env) http.Handler {
 	r.Handler(http.MethodGet, "/", dynamicMiddleware.Then(web.Handler{e, mg.getAllMaybes}))
 	r.Handler(http.MethodGet, "/maybes", dynamicMiddleware.Then(web.Handler{e, mg.getMaybesQueryFilter}))
 	r.Handler(http.MethodGet, "/maybes/:id", dynamicMiddleware.Then(web.Handler{e, mg.getMaybeByID}))
+
+	// user
+	ug := userGroup{
+		user: user.New(e.Db),
+	}
+	r.Handler(http.MethodGet, "/users/signup", dynamicMiddleware.Then(web.Handler{e, ug.signupForm}))
+	r.Handler(http.MethodGet, "/users/login", dynamicMiddleware.Then(web.Handler{e, ug.loginForm}))
 
 	// fileServer
 	fileServer := http.FileServer(web.NeuteredFileSystem{http.Dir("./ui/static/")})
