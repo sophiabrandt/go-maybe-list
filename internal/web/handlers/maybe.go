@@ -12,7 +12,11 @@ import (
 )
 
 type maybeGroup struct {
-	maybe *maybe.RepositoryDb
+	maybe interface {
+		Query() (maybe.Infos, error)
+		QueryByID(id string) (maybe.Info, error)
+		QueryByTitle(title string) (maybe.Infos, error)
+	}
 }
 
 func (mg maybeGroup) getAllMaybes(e *env.Env, w http.ResponseWriter, r *http.Request) error {

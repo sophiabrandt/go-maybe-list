@@ -105,7 +105,7 @@ func SecureHeaders(next http.Handler) http.Handler {
 	})
 }
 
-func Authenticate(e *env.Env, ur *user.RepositoryDb) func(http.Handler) http.Handler {
+func Authenticate(e *env.Env, ur user.RepositoryDb) func(http.Handler) http.Handler {
 	return func(next http.Handler) http.Handler {
 		fn := func(w http.ResponseWriter, r *http.Request) {
 			exists := e.Session.Exists(r, "authenticatedUserID")

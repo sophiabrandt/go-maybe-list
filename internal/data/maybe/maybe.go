@@ -21,22 +21,13 @@ type RepositoryDb struct {
 	Db *sqlx.DB
 }
 
-// Repo is the interface for the maybe repository.
-type Repo interface {
-	Query() (Infos, error)
-	QueryByID(id string) (Info, error)
-	QueryByTitle(title string) (Info, error)
-	Create(maybe NewMaybe) (Info, error)
-	Delete(id string) error
-}
-
 // New returns a pointer to a book repo.
-func New(db *sqlx.DB) *RepositoryDb {
-	return &RepositoryDb{Db: db}
+func New(db *sqlx.DB) RepositoryDb {
+	return RepositoryDb{Db: db}
 }
 
 // Query retrieves all maybes from the database.
-func (r *RepositoryDb) Query() (Infos, error) {
+func (r RepositoryDb) Query() (Infos, error) {
 	const q = `
 	SELECT
 		m.*,
@@ -54,7 +45,7 @@ func (r *RepositoryDb) Query() (Infos, error) {
 }
 
 // QuerybyID retrieves a book by ID from the database.
-func (r *RepositoryDb) QueryByID(id string) (Info, error) {
+func (r RepositoryDb) QueryByID(id string) (Info, error) {
 	if _, err := uuid.Parse(id); err != nil {
 		return Info{}, ErrInvalidID
 	}
@@ -81,7 +72,7 @@ func (r *RepositoryDb) QueryByID(id string) (Info, error) {
 }
 
 // QuerybyTitle retrieves an entry by quering the title from the database.
-func (r *RepositoryDb) QueryByTitle(title string) (Infos, error) {
+func (r RepositoryDb) QueryByTitle(title string) (Infos, error) {
 	const q = `
 	SELECT
 		m.*,

@@ -12,7 +12,11 @@ import (
 )
 
 type userGroup struct {
-	user *user.RepositoryDb
+	user interface {
+		QueryByID(id string) (user.Info, error)
+		Create(user user.NewUser) (user.Info, error)
+		Authenticate(email, password string) (string, error)
+	}
 }
 
 func (ug userGroup) signupForm(e *env.Env, w http.ResponseWriter, r *http.Request) error {
