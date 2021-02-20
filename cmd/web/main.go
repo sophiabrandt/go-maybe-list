@@ -46,10 +46,11 @@ func run(ctx context.Context, log *log.Logger) error {
 
 	addr := flag.String("addr", "0.0.0.0:4000", "Http network address")
 	secret := flag.String("secret", "60FNA&6bdH+FnhG306I6MNCY8bv_WjwDcjB", "Secret key")
+	dbName := flag.String("dbName", "database.sqlite", "database name")
 	flag.Parse()
 
 	// database
-	db, err := database.New()
+	db, err := database.New(*dbName)
 	if err != nil {
 		return errors.Wrap(err, "could not start server")
 	}

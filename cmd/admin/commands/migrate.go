@@ -9,8 +9,8 @@ import (
 )
 
 // Migrate creates the schema in the database.
-func Migrate() error {
-	db, err := database.New()
+func Migrate(dbName string) error {
+	db, err := database.New(dbName)
 	if err != nil {
 		return errors.Wrap(err, "could not connect to database")
 	}

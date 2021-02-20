@@ -9,8 +9,8 @@ import (
 )
 
 // Seed loads test data into the database.
-func Seed() error {
-	db, err := database.New()
+func Seed(dbName string) error {
+	db, err := database.New(dbName)
 	if err != nil {
 		return errors.Wrap(err, "could not connect to database")
 	}

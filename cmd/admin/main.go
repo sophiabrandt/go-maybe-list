@@ -20,15 +20,16 @@ func main() {
 
 func run(log *log.Logger) error {
 	command := flag.String("action", "", "admin command: migrate | seed")
+	dbName := flag.String("dbName", "database.sqlite", "database name")
 	flag.Parse()
 
 	switch *command {
 	case "migrate":
-		if err := commands.Migrate(); err != nil {
+		if err := commands.Migrate(*dbName); err != nil {
 			return errors.Wrap(err, "migrating database")
 		}
 	case "seed":
-		if err := commands.Seed(); err != nil {
+		if err := commands.Seed(*dbName); err != nil {
 			return errors.Wrap(err, "seeding database")
 		}
 	default:
