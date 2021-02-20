@@ -1,8 +1,11 @@
+// middleware package
+// From the follwing sources:
 // https://blog.questionable.services/article/guide-logging-middleware-go/
 // https://lets-go.alexedwards.net/
-package middleware
+package mid
 
 import (
+	"context"
 	"log"
 	"net/http"
 	"runtime/debug"
@@ -10,6 +13,7 @@ import (
 
 	"github.com/justinas/nosurf"
 	"github.com/pkg/errors"
+	"github.com/sophiabrandt/go-maybe-list/internal/data/user"
 	"github.com/sophiabrandt/go-maybe-list/internal/env"
 	"github.com/sophiabrandt/go-maybe-list/internal/web/web"
 )
@@ -99,6 +103,34 @@ func SecureHeaders(next http.Handler) http.Handler {
 
 		next.ServeHTTP(w, r)
 	})
+}
+
+func Authenticate(e *env.Env, ur *user.RepositoryDb) func(http.Handler) http.Handler {
+	return func(next http.Handler) http.Handler {
+		fn := func(w http.ResponseWriter, r *http.Request) {
+			exists := e.Session.Exists(r, "authenticatedUserID")
+			if !exists {
+				next.ServeHTTP(w, r)
+				return
+			}
+
+			// check for existing user
+			usr, err := ur.QueryByID(e.Session.GetString(r, "authenticatedUserID"))
+			if errors.Is(err, user.ErrNotFound) || !usr.Active {
+				e.Session.Remove(r, "authenticatedUserID")
+				next.ServeHTTP(w, r)
+				return
+			} else if err != nil {
+				http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+				return
+			}
+
+			// add authentication context key
+			ctx := context.WithValue(r.Context(), web.ContextKeyIsAuthenticated, true)
+			next.ServeHTTP(w, r.WithContext(ctx))
+		}
+		return http.HandlerFunc(fn)
+	}
 }
 
 // RequireAuthentication checks if an authenticatedUserID exists on the request.

@@ -20,8 +20,9 @@ func health(e *env.Env, w http.ResponseWriter, r *http.Request) error {
 		Status string `json:"status`
 	}{Status: status}
 
-	// Write the status code to the response.
+	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(statusCode)
+
 	json.NewEncoder(w).Encode(health)
 	return nil
 }

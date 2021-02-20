@@ -35,6 +35,7 @@ type RepositoryDb struct {
 
 // Repo is the interface for the maybe repository.
 type Repo interface {
+	QueryByID(id string) (Info, error)
 	Create(user NewUser) (Info, error)
 	Authenticate(user Info) (string, error)
 }
@@ -44,6 +45,32 @@ func New(db *sqlx.DB) *RepositoryDb {
 	return &RepositoryDb{Db: db}
 }
 
+// QueryByID gets the specified user from the database.
+func (r *RepositoryDb) QueryByID(id string) (Info, error) {
+	if _, err := uuid.Parse(id); err != nil {
+		return Info{}, ErrInvalidID
+	}
+
+	const q = `
+	SELECT
+		*
+	FROM
+		users
+	WHERE 
+		user_id = $1`
+
+	var usr Info
+	if err := r.Db.Get(&usr, q, id); err != nil {
+		if err == sql.ErrNoRows {
+			return Info{}, ErrNotFound
+		}
+		return Info{}, errors.Wrapf(err, "selecting user %q", id)
+	}
+
+	return usr, nil
+}
+
+// Create inserts a new user into the database.
 func (r *RepositoryDb) Create(user NewUser) (Info, error) {
 	hash, err := bcrypt.GenerateFromPassword([]byte(user.Password), bcrypt.DefaultCost)
 	if err != nil {
@@ -79,6 +106,7 @@ func (r *RepositoryDb) Create(user NewUser) (Info, error) {
 	return usr, nil
 }
 
+// Authenticate queries the database for a user with a matching pasword.
 func (r *RepositoryDb) Authenticate(email, password string) (string, error) {
 	var id string
 	var hash []byte

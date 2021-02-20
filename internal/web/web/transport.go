@@ -8,6 +8,10 @@ import (
 	"github.com/sophiabrandt/go-maybe-list/internal/env"
 )
 
+type contextKey string
+
+const ContextKeyIsAuthenticated = contextKey("isAuthenticated")
+
 // Error represents a handler error. It provides methods for a HTTP status
 // code and embeds the built-in error interface.
 type Error interface {
