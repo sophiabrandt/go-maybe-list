@@ -30,9 +30,7 @@
       </nav>
       <main class="wrapper stack main__content">
         {{with .Flash}}
-         <div class="center flash__container">
-            <div class="flash">{{.}}</div>
-         </div>
+          <div class="flash">{{.}}</div>
         {{end}}
         {{template "main" .}}
       </main>

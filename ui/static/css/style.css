@@ -178,15 +178,11 @@ textarea {
   background-color: var(--color-background);
 }
 input[type="submit"] {
-  color: var(--color-dark);
+  color: var(--color-neutral);
 }
 
 .inline-label {
   display: inline-block;
-}
-
-.flash__container {
-  min-width: 80vw;
 }
 
 .flash {
