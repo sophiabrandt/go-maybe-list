@@ -1,0 +1,18 @@
+# Build environment
+# -----------------
+FROM golang:1.15-alpine
+
+WORKDIR /app
+
+RUN apk update && apk add --no-cache sqlite gcc musl-dev git
+
+RUN apk update && apk add --no-cache bash
+
+RUN adduser -D user && chown -R user:user /app
+USER user
+
+COPY . .
+
+EXPOSE 4000
+
+CMD [ "go", "run", "./cmd/web"]
