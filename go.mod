@@ -11,6 +11,7 @@ require (
 	github.com/google/uuid v1.2.0
 	github.com/jmoiron/sqlx v1.3.1
 	github.com/justinas/alice v1.2.0
+	github.com/justinas/nosurf v1.1.1
 	github.com/pkg/errors v0.9.1
 	golang.org/x/crypto v0.0.0-20200622213623-75b288015ac9
 	modernc.org/sqlite v1.8.7

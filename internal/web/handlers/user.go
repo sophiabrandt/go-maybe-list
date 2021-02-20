@@ -37,7 +37,8 @@ func (ug userGroup) signup(e *env.Env, w http.ResponseWriter, r *http.Request) e
 		}
 	}
 
-	http.Redirect(w, r, "/maybes", http.StatusSeeOther)
+	e.Session.Put(r, "flash", "Signup successful. Please log in.")
+	http.Redirect(w, r, "/users/login", http.StatusSeeOther)
 	return nil
 }
 

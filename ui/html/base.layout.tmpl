@@ -1,12 +1,12 @@
 
 {{define "base"}}
 <!doctype html>
-<html lang='en'>
+<html lang="en">
     <head>
-        <meta charset='utf-8'>
-        <link rel='stylesheet' href='/static/css/reset.min.css'>
-        <link rel='stylesheet' href='/static/css/style.css'>
-        <link rel='shortcut icon' href='/static/img/favicon.ico' type='image/x-icon'>
+        <meta charset="utf-8">
+        <link rel="stylesheet" href="/static/css/reset.min.css">
+        <link rel="stylesheet" href="/static/css/style.css">
+        <link rel="shortcut icon" href="/static/img/favicon.ico" type="image/x-icon">
         <title>{{template "title" .}} - Maybe List</title>
     </head>
     <body>
@@ -18,7 +18,8 @@
         <div>
           <a href="/">Home</a>
           {{if .IsAuthenticated}}
-          <form action='/users/logout' method='POST'>
+          <form action="/users/logout" method="POST">
+              <input type="hidden" name="csrf_token" value="{{.CSRFToken}}">
               <button>Logout</button>
           </form>
           {{else}}

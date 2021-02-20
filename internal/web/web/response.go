@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"time"
 
+	"github.com/justinas/nosurf"
 	"github.com/sophiabrandt/go-maybe-list/internal/data"
 	"github.com/sophiabrandt/go-maybe-list/internal/env"
 )
@@ -23,6 +24,7 @@ func addDefaultData(e *env.Env, r *http.Request, dt *data.TemplateData) *data.Te
 	dt.CurrentYear = time.Now().Year()
 	dt.Flash = e.Session.PopString(r, "flash")
 	dt.IsAuthenticated = IsAuthenticated(e, r)
+	dt.CSRFToken = nosurf.Token(r)
 
 	return dt
 }

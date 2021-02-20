@@ -15,7 +15,7 @@ import (
 func New(e *env.Env) http.Handler {
 	standardMiddleware := alice.New(middleware.SecureHeaders, middleware.LogRequest(e.Log), middleware.RecoverPanic(e.Log))
 
-	dynamicMiddleware := alice.New(e.Session.Enable)
+	dynamicMiddleware := alice.New(e.Session.Enable, middleware.NoSurf)
 
 	r := e.Router
 

@@ -13,4 +13,5 @@ type TemplateData struct {
 	Flash           string
 	CurrentYear     int
 	IsAuthenticated bool
+	CSRFToken       string
 }

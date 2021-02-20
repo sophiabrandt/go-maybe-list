@@ -5,6 +5,7 @@
 {{define "main"}}
 <div class="box">
   <form class="stack" action="/users/login" method="POST" novalidate>
+    <input type="hidden" name="csrf_token" value="{{.CSRFToken}}">
     {{with .Form}}
     {{with .Errors.Get "generic"}}
     <div class="error">{{.}}</div>

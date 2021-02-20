@@ -26,15 +26,6 @@
     --color-dark: #f1faee;
     --color-light: #290149;
   }
-  input[type="text"],
-  input[type="email"],
-  input[type="password"],
-  textarea {
-    background-color: var(--color-neutral);
-  }
-  input[type="submit"] {
-    color: var(--color-light);
-  }
 }
 
 :focus {
@@ -178,6 +169,16 @@ form input {
 
 textarea {
   max-width: 95%;
+}
+
+input[type="text"],
+input[type="email"],
+input[type="password"],
+textarea {
+  background-color: var(--color-background);
+}
+input[type="submit"] {
+  color: var(--color-dark);
 }
 
 .inline-label {
