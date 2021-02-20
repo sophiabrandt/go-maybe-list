@@ -4,15 +4,20 @@ import (
 	"encoding/json"
 	"net/http"
 
+	"github.com/jmoiron/sqlx"
 	"github.com/sophiabrandt/go-maybe-list/internal/adapter/database"
 	"github.com/sophiabrandt/go-maybe-list/internal/env"
 )
 
+type debugGroup struct {
+	db *sqlx.DB
+}
+
 // health checks if the service is available and database is up.
-func health(e *env.Env, w http.ResponseWriter, r *http.Request) error {
+func (dg debugGroup) health(e *env.Env, w http.ResponseWriter, r *http.Request) error {
 	status := "ok"
 	statusCode := http.StatusOK
-	if err := database.StatusCheck(e.Db); err != nil {
+	if err := database.StatusCheck(dg.db); err != nil {
 		status = "db not ready"
 		statusCode = http.StatusInternalServerError
 	}

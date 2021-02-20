@@ -3,6 +3,8 @@ package handlers
 import (
 	"net/http"
 
+	"github.com/dimfeld/httptreemux/v5"
+	"github.com/jmoiron/sqlx"
 	"github.com/justinas/alice"
 	"github.com/sophiabrandt/go-maybe-list/internal/data/maybe"
 	"github.com/sophiabrandt/go-maybe-list/internal/data/user"
@@ -12,19 +14,22 @@ import (
 )
 
 // New creates a new router with all application routes.
-func New(e *env.Env) http.Handler {
+func New(e *env.Env, db *sqlx.DB) http.Handler {
 	standardMiddleware := alice.New(mid.SecureHeaders, mid.LogRequest(e.Log), mid.RecoverPanic(e.Log))
 
-	dynamicMiddleware := alice.New(e.Session.Enable, mid.NoSurf, mid.Authenticate(e, user.New(e.Db)))
+	dynamicMiddleware := alice.New(e.Session.Enable, mid.NoSurf, mid.Authenticate(e, user.New(db)))
 
-	r := e.Router
+	r := httptreemux.NewContextMux()
 
 	// liveness check
-	r.Handler(http.MethodGet, "/debug/health", web.Handler{e, health})
+	dg := debugGroup{
+		db: db,
+	}
+	r.Handler(http.MethodGet, "/debug/health", web.Handler{e, dg.health})
 
 	// maybe routes
 	mg := maybeGroup{
-		maybe: maybe.New(e.Db),
+		maybe: maybe.New(db),
 	}
 	r.Handler(http.MethodGet, "/", dynamicMiddleware.Then(web.Handler{e, mg.getAllMaybes}))
 	r.Handler(http.MethodGet, "/maybes", dynamicMiddleware.Append(mid.RequireAuthentication(e)).Then(web.Handler{e, mg.getMaybesQueryFilter}))
@@ -32,7 +37,7 @@ func New(e *env.Env) http.Handler {
 
 	// user
 	ug := userGroup{
-		user: user.New(e.Db),
+		user: user.New(db),
 	}
 	r.Handler(http.MethodGet, "/users/signup", dynamicMiddleware.Then(web.Handler{e, ug.signupForm}))
 	r.Handler(http.MethodPost, "/users/signup", dynamicMiddleware.Then(web.Handler{e, ug.signup}))
