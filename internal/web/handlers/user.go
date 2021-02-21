@@ -24,13 +24,24 @@ func (ug userGroup) signupForm(e *env.Env, w http.ResponseWriter, r *http.Reques
 }
 
 func (ug userGroup) signup(e *env.Env, w http.ResponseWriter, r *http.Request) error {
-	var nu user.NewUser
-	form, err := web.DecodeForm(r, &nu)
-	if err != nil {
+	// form validation
+	form := forms.New(r.PostForm)
+	form.Required("name", "email", "password")
+	form.MaxLength("name", 255)
+	form.SecurePassword("password")
+	form.IsEqualString("password", "confirm password")
+
+	if !form.Valid() {
 		return web.Render(e, w, r, "signup.page.tmpl", &data.TemplateData{Form: form}, http.StatusUnprocessableEntity)
 	}
 
-	_, err = ug.user.Create(nu)
+	nu := user.NewUser{
+		Name:            form.Get("name"),
+		Email:           form.Get("email"),
+		Password:        form.Get("password"),
+		PasswordConfirm: form.Get("password_confirm"),
+	}
+	_, err := ug.user.Create(nu)
 	if err != nil {
 		switch errors.Cause(err) {
 		case user.ErrDuplicateEmail:
@@ -58,11 +69,6 @@ func (ug userGroup) loginForm(e *env.Env, w http.ResponseWriter, r *http.Request
 }
 
 func (ug userGroup) login(e *env.Env, w http.ResponseWriter, r *http.Request) error {
-	err := r.ParseForm()
-	if err != nil {
-		return web.StatusError{Err: err, Code: http.StatusBadRequest}
-	}
-
 	form := forms.New(r.PostForm)
 	id, err := ug.user.Authenticate(form.Get("email"), form.Get("password"))
 	if err != nil {

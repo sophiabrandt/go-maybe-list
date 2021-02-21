@@ -28,10 +28,10 @@
     </div>
     <div>
       <label>Confirm Password:</label>
-      {{with .Errors.Get "password_confirm"}}
+      {{with .Errors.Get "confirm password"}}
       <label class="error">{{.}}</label>
       {{end}}
-      <input type="password" name="password_confirm" />
+      <input type="password" name="confirm password" />
     </div>
     <div>
       <input type="submit" value="signup" />

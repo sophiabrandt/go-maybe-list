@@ -52,7 +52,7 @@ PRIMARY KEY (maybe_id),
 FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE
 );
 -- Create index on maybe titles
-CREATE UNIQUE INDEX idx_maybe_title ON maybes(title);
+CREATE INDEX idx_maybe_title ON maybes(title);
 -- Create tags
 CREATE TABLE tags (
 	tag_id         UUID NOT NULL,

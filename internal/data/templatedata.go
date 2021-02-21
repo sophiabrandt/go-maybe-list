@@ -9,6 +9,8 @@ import (
 type TemplateData struct {
 	Maybe           *maybe.Info
 	Maybes          maybe.Infos
+	Tag             *maybe.Tag
+	Tags            []*maybe.Tag
 	Form            *forms.Form
 	Flash           string
 	CurrentYear     int

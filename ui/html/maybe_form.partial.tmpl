@@ -1,0 +1,57 @@
+{{define "maybe_form"}}
+    <div>
+      <label>
+        <span>Title:</span><br />
+        {{with .Errors.Get "title"}}
+          <label class="error">{{.}}</label>
+        {{end}}
+        <input
+          type="text"
+          placeholder="My title"
+          name="title"
+          value="{{.Get "title"}}"
+        >
+      </label>
+    </div>
+    <div>
+      <label>
+        <span>URL:</span><br />
+        {{with .Errors.Get "url"}}
+          <label class="error">{{.}}</label>
+        {{end}}
+        <input
+          type="text"
+          placeholder="http://example.com"
+          name="url"
+          value="{{.Get "url"}}"
+        >
+      </label>
+    </div>
+    <div>
+      <label>
+        <span>Description:</span><br />
+        {{with .Errors.Get "description"}}
+          <label class="error">{{.}}</label>
+        {{end}}
+        <textarea
+          name="description"
+          placeholder="Description"
+          cols="40"
+          rows="5"
+        >{{.Get "description"}}</textarea>
+      </label>
+      <div>
+      <label>
+        <span>(Optional) Tags:</span><br />
+        {{with .Errors.Get "tags"}}
+          <label class="error">{{.}}</label>
+        {{end}}
+        <input
+          type="text"
+          placeholder="tag1, tag2, tag3"
+          name="tags"
+          value="{{.Get "tags"}}"
+        >
+      </label>
+    </div>
+{{end}}

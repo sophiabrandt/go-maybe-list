@@ -18,6 +18,7 @@
         <div>
           <a href="/">Home</a>
           {{if .IsAuthenticated}}
+          <a href="/maybes/new">New Maybe</a>
           <form action="/users/logout" method="POST">
               <input type="hidden" name="csrf_token" value="{{.CSRFToken}}">
               <button>Logout</button>

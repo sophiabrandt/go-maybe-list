@@ -2,14 +2,14 @@ package maybe
 
 // Info is the model for maybes.
 type Info struct {
-	ID          string `db:"maybe_id"`
-	UserID      string `db:"user_id"`
-	Title       string `db:"title"`
-	Url         string `db:"url"`
-	Description string `db:"description"`
-	Tags        []*Tag `db:"tags"`
-	DateCreated string `db:"created_at"`
-	DateUpdated string `db:"updated_at"`
+	ID          string   `db:"maybe_id"`
+	UserID      string   `db:"user_id"`
+	Title       string   `db:"title"`
+	Url         string   `db:"url"`
+	Description string   `db:"description"`
+	Tags        []string `db:"tags"`
+	DateCreated string   `db:"created_at"`
+	DateUpdated string   `db:"updated_at"`
 }
 
 // Tag is the model for a tag.
@@ -23,17 +23,22 @@ type Infos []Info
 // NewMaybe is the data for creating a new maybe.
 // Adding Tags is optional.
 type NewMaybe struct {
-	Title       string `json:"title" validate:"required"`
-	Url         string `json:"url" validate:"required,url,max=255"`
-	Description string `json:"description" validate:"required,max=255"`
-	Tags        []*Tag `json:"tags" validate:"omitempty"`
+	Title       string
+	Url         string
+	Description string
+	Tags        []string
 }
 
-// UpdateBook defines the information for updating an existing product.
+// NewTag is the data for creating a new tag.
+type NewTag struct {
+	Name string `db:"name"`
+}
+
+// UpdateMaybe defines the information for updating an existing maybe.
 // Fields are optional.
 type UpdateBook struct {
-	Title       *string `json:"title" validate:"omitempty"`
-	Url         *string `json:"image_url" validate:"omitempty,url"`
-	Description *string `json:"description" validate:"omitempty"`
-	Tags        []*Tag  `json:"tags" validate:"omitempty"`
+	Title       *string
+	Url         *string
+	Description *string
+	Tags        []string
 }

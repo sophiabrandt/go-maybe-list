@@ -13,8 +13,8 @@ type Info struct {
 
 // NewUser contains information needed to create a new user.
 type NewUser struct {
-	Name            string `json:"name" validate:"required"`
-	Email           string `json:"email" validate:"required,email"`
-	Password        string `json:"password" validate:"required,secure_password"`
-	PasswordConfirm string `json:"password_confirm" validate:"eqfield=Password"`
+	Name            string
+	Email           string
+	Password        string
+	PasswordConfirm string
 }

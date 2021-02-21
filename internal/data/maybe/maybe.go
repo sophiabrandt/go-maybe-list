@@ -2,6 +2,7 @@ package maybe
 
 import (
 	"database/sql"
+	"time"
 
 	"github.com/google/uuid"
 	"github.com/jmoiron/sqlx"
@@ -14,6 +15,9 @@ var (
 
 	// ErrInvalidID occurs when an ID is not in a valid form.
 	ErrInvalidID = errors.New("ID is not in its proper form")
+
+	// ErrInvalidTag occurs when a tag cannot be found in the dabase and cannot be created.
+	ErrInvalidTag = errors.New("tag not found")
 )
 
 // RepositoryDb defines the repository for the book service.
@@ -91,4 +95,61 @@ func (r RepositoryDb) QueryByTitle(title string) (Infos, error) {
 		return maybes, errors.Wrap(err, "selecting maybes by title")
 	}
 	return maybes, nil
+}
+
+// Create adds a new maybe to the database with pre-filled ID and date fields.
+func (r RepositoryDb) Create(nm NewMaybe, userID string) (Info, error) {
+	maybe := Info{
+		ID:          uuid.New().String(),
+		Title:       nm.Title,
+		Url:         nm.Url,
+		Description: nm.Description,
+		Tags:        nil,
+		DateCreated: time.Now().UTC().String(),
+		DateUpdated: time.Now().UTC().String(),
+	}
+
+	if nm.Tags != nil {
+		maybe.Tags = nm.Tags
+
+		// For each tag:
+		// * find the tag's ID in the database OR create a new tag
+		// * create an entry in the linking table.
+		for _, tagName := range maybe.Tags {
+			row := r.Db.QueryRowx("SELECT tag_id FROM tags where name = $1", tagName)
+			var tagID string
+			err := row.Scan(&tagID)
+			if err != nil {
+				// tag does not exist in database, create
+				tagID = uuid.New().String()
+				const q = `
+				INSERT INTO	tags (tag_id, name)
+				VALUES ($1, $2)
+				`
+				if _, err := r.Db.Exec(q, tagID, tagName); err != nil {
+					return Info{}, ErrInvalidTag
+				}
+			}
+			const q = `
+			INSERT INTO maybetags (maybe_id, tag_id)
+			VALUES ($1, $2)
+			`
+			_, err = r.Db.Exec(q, maybe.ID, tagID)
+			if err != nil {
+				return Info{}, errors.Wrap(err, "inserting into linking table maybetags")
+			}
+		}
+	}
+
+	const q = `
+	INSERT INTO maybes
+		(maybe_id, user_id, title, url, description, created_at, updated_at)
+	VALUES
+		($1, $2, $3, $4, $5, $6, $7)
+	`
+
+	if _, err := r.Db.Exec(q, maybe.ID, userID, maybe.Title, maybe.Url, maybe.Description, maybe.DateCreated, maybe.DateUpdated); err != nil {
+		return Info{}, errors.Wrap(err, "inserting new maybe")
+	}
+	return maybe, nil
 }

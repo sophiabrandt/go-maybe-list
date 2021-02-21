@@ -1,0 +1,19 @@
+{{template "base" .}}
+
+{{define "title"}}Create a New Entry{{end}}
+
+{{define "main"}}
+<form class="center form" action="/maybes/new" method="POST">
+  <input type="hidden" name="csrf_token" value="{{.CSRFToken}}">
+  {{with .Form}}
+  <div class="stack form-background">
+    <div>
+    {{template "maybe_form" .}}
+    </div>
+    <div>
+      <button class="mt success" type="submit">Create New Maybe</button>
+    </div>
+  </div>
+  {{end}}
+</form>
+{{end}}
