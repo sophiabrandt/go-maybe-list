@@ -49,8 +49,8 @@ func (r RepositoryDb) Query() (Infos, error) {
 }
 
 // QuerybyID retrieves a book by ID from the database.
-func (r RepositoryDb) QueryByID(id string) (Info, error) {
-	if _, err := uuid.Parse(id); err != nil {
+func (r RepositoryDb) QueryByID(maybeID string) (Info, error) {
+	if _, err := uuid.Parse(maybeID); err != nil {
 		return Info{}, ErrInvalidID
 	}
 
@@ -66,11 +66,11 @@ func (r RepositoryDb) QueryByID(id string) (Info, error) {
 	`
 
 	var maybe Info
-	if err := r.Db.Get(&maybe, q, id); err != nil {
+	if err := r.Db.Get(&maybe, q, maybeID); err != nil {
 		if err == sql.ErrNoRows {
 			return maybe, ErrNotFound
 		}
-		return maybe, errors.Wrapf(err, "selecting maybe with ID %s", id)
+		return maybe, errors.Wrapf(err, "selecting maybe with ID %s", maybeID)
 	}
 	return maybe, nil
 }
@@ -222,5 +222,25 @@ func (r RepositoryDb) Update(um NewOrUpdateMaybe, maybeID string) error {
 	if _, err := r.Db.Exec(q, maybeID, maybe.Title, maybe.Url, maybe.Description); err != nil {
 		return errors.Wrap(err, "updating product")
 	}
+	return nil
+}
+
+// Delete removes a maybe with given ID from the database.
+func (r RepositoryDb) Delete(maybeID string) error {
+	if _, err := uuid.Parse(maybeID); err != nil {
+		return ErrInvalidID
+	}
+
+	const q = `
+	DELETE FROM
+		maybes
+	WHERE
+		maybe_id = $1
+	`
+
+	if _, err := r.Db.Exec(q, maybeID); err != nil {
+		return errors.Wrapf(err, "deleting maybe %s", maybeID)
+	}
+
 	return nil
 }

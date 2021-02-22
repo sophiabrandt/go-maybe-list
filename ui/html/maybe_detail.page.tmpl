@@ -3,6 +3,7 @@
 {{define "title"}}Maybe #{{.Maybe.ID}}{{end}}
 
 {{define "main"}}
+{{$csrf_token := .CSRFToken}}
     <div class="center">
         <div class="grid stack">
         {{with .Maybe}}
@@ -17,6 +18,7 @@
               <button>Bookmark 🔖</button>
             </div>
               <form action="/maybes/{{.ID}}/delete" method="POST">
+                <input type="hidden" name="csrf_token" value="{{$csrf_token}}">
                   <span class="danger">Danger Zone:</span><button class="danger--button" type="submit">Delete ⚠️</button>
               </form>
           </div>

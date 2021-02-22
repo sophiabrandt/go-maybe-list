@@ -17,10 +17,11 @@ import (
 type maybeGroup struct {
 	maybe interface {
 		Query() (maybe.Infos, error)
-		QueryByID(id string) (maybe.Info, error)
+		QueryByID(maybeID string) (maybe.Info, error)
 		QueryByTitle(title string) (maybe.Infos, error)
 		Create(nm maybe.NewOrUpdateMaybe, userID string) (maybe.Info, error)
 		Update(um maybe.NewOrUpdateMaybe, maybeID string) error
+		Delete(maybeID string) error
 	}
 }
 
@@ -196,5 +197,26 @@ func (mg maybeGroup) updateMaybe(e *env.Env, w http.ResponseWriter, r *http.Requ
 
 	http.Redirect(w, r, fmt.Sprintf("/maybes/%v", params["id"]), http.StatusSeeOther)
 
+	return nil
+}
+
+func (mg maybeGroup) deleteMaybe(e *env.Env, w http.ResponseWriter, r *http.Request) error {
+	params := web.Params(r)
+
+	err := mg.maybe.Delete(params["id"])
+	if err != nil {
+		switch errors.Cause(err) {
+		case maybe.ErrInvalidID:
+			return web.StatusError{Err: err, Code: http.StatusBadRequest}
+		case maybe.ErrNotFound:
+			return web.StatusError{Err: err, Code: http.StatusNotFound}
+		default:
+			return errors.Wrapf(err, "deleting maybe with ID: %s", params["id"])
+		}
+	}
+
+	e.Session.Put(r, "flash", "Maybe successfully deleted!")
+
+	http.Redirect(w, r, "/maybes", http.StatusSeeOther)
 	return nil
 }
