@@ -19,7 +19,8 @@ type maybeGroup struct {
 		Query() (maybe.Infos, error)
 		QueryByID(id string) (maybe.Info, error)
 		QueryByTitle(title string) (maybe.Infos, error)
-		Create(nm maybe.NewMaybe, userID string) (maybe.Info, error)
+		Create(nm maybe.NewOrUpdateMaybe, userID string) (maybe.Info, error)
+		Update(um maybe.NewOrUpdateMaybe, maybeID string) error
 	}
 }
 
@@ -83,7 +84,7 @@ func (mg maybeGroup) createMaybe(e *env.Env, w http.ResponseWriter, r *http.Requ
 		return web.Render(e, w, r, "create.page.tmpl", &data.TemplateData{Form: form}, http.StatusUnprocessableEntity)
 	}
 
-	nm := maybe.NewMaybe{
+	nm := maybe.NewOrUpdateMaybe{
 		Title:       strings.TrimSpace(form.Get("title")),
 		Url:         form.Get("url"),
 		Description: form.Get("description"),
@@ -119,6 +120,81 @@ func (mg maybeGroup) createMaybe(e *env.Env, w http.ResponseWriter, r *http.Requ
 	e.Session.Put(r, "flash", "Maybe successfully created!")
 
 	http.Redirect(w, r, fmt.Sprintf("/maybes/%v", myb.ID), http.StatusSeeOther)
+
+	return nil
+}
+
+func (mg maybeGroup) updateMaybeForm(e *env.Env, w http.ResponseWriter, r *http.Request) error {
+	params := web.Params(r)
+	mb, err := mg.maybe.QueryByID(params["id"])
+	if err != nil {
+		switch errors.Cause(err) {
+		case maybe.ErrInvalidID:
+			return web.StatusError{Err: err, Code: http.StatusBadRequest}
+		case maybe.ErrNotFound:
+			return web.StatusError{Err: err, Code: http.StatusNotFound}
+		default:
+			return errors.Wrapf(err, "ID : %s", params["id"])
+		}
+	}
+
+	// populate form with previous values
+	form := forms.New(url.Values{})
+	form.Set("title", mb.Title)
+	form.Set("url", mb.Url)
+	form.Set("description", mb.Description)
+	form.Set("tags", strings.Join(mb.Tags[:], ","))
+
+	return web.Render(e, w, r, "update.page.tmpl", &data.TemplateData{Maybe: &mb, Form: form}, http.StatusOK)
+}
+
+func (mg maybeGroup) updateMaybe(e *env.Env, w http.ResponseWriter, r *http.Request) error {
+	params := web.Params(r)
+	// form validation
+	form := forms.New(r.PostForm)
+	form.MaxLength("title", 255)
+	form.ValidUrl("url")
+	form.MaxLength("description", 255)
+
+	if !form.Valid() {
+		return web.Render(e, w, r, "update.page.tmpl", &data.TemplateData{Form: form}, http.StatusUnprocessableEntity)
+	}
+
+	um := maybe.NewOrUpdateMaybe{
+		Title:       strings.TrimSpace(form.Get("title")),
+		Url:         form.Get("url"),
+		Description: form.Get("description"),
+		Tags:        nil,
+	}
+
+	// if user added tags into the form, make a slice of tags,
+	// sanitize them and add them to the model
+	tags := strings.TrimSpace(form.Get("tags"))
+	if tags != "" {
+		t := strings.Split(tags, ",")
+		// trim whitespace
+		trimT := make([]string, len(t))
+		for i, tag := range t {
+			trimT[i] = strings.TrimSpace(tag)
+		}
+		um.Tags = trimT
+	}
+
+	err := mg.maybe.Update(um, params["id"])
+	if err != nil {
+		switch errors.Cause(err) {
+		case maybe.ErrInvalidID:
+			return web.StatusError{Err: err, Code: http.StatusBadRequest}
+		case maybe.ErrNotFound:
+			return web.StatusError{Err: err, Code: http.StatusNotFound}
+		default:
+			return errors.Wrapf(err, "updating new maybe: %v", um)
+		}
+	}
+
+	e.Session.Put(r, "flash", "Maybe successfully updated!")
+
+	http.Redirect(w, r, fmt.Sprintf("/maybes/%v", params["id"]), http.StatusSeeOther)
 
 	return nil
 }

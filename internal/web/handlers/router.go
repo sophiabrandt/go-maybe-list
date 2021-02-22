@@ -36,6 +36,8 @@ func New(e *env.Env, db *sqlx.DB) http.Handler {
 	r.Handler(http.MethodGet, "/maybes/new", dynamicMiddleware.Append(mid.RequireAuthentication(e)).Then(web.Handler{e, mg.createMaybeForm}))
 	r.Handler(http.MethodPost, "/maybes/new", dynamicMiddleware.Append(mid.RequireAuthentication(e)).Then(web.Handler{e, mg.createMaybe}))
 	r.Handler(http.MethodGet, "/maybes/:id", dynamicMiddleware.Append(mid.RequireAuthentication(e)).Then(web.Handler{e, mg.getMaybeByID}))
+	r.Handler(http.MethodGet, "/maybes/:id/update", dynamicMiddleware.Append(mid.RequireAuthentication(e)).Then(web.Handler{e, mg.updateMaybeForm}))
+	r.Handler(http.MethodPost, "/maybes/:id/update", dynamicMiddleware.Append(mid.RequireAuthentication(e)).Then(web.Handler{e, mg.updateMaybe}))
 
 	// user
 	ug := userGroup{

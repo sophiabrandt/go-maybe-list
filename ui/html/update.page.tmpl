@@ -1,0 +1,21 @@
+{{template "base" .}}
+
+{{define "title"}}Update Maybe{{end}}
+
+{{define "main"}}
+{{if .Maybe}}
+<form class="center form" action="/maybes/{{.Maybe.ID}}/update" method="POST">
+  <input type="hidden" name="csrf_token" value="{{.CSRFToken}}">
+  {{with .Form}}
+  <div class="stack form-background">
+    <div>
+    {{template "maybe_form" .}}
+    </div>
+    <div>
+      <button class="mt success" type="submit">Update Maybe</button>
+    </div>
+  </div>
+  {{end}}
+</form>
+{{end}}
+{{end}}

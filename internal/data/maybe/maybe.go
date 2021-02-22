@@ -98,7 +98,7 @@ func (r RepositoryDb) QueryByTitle(title string) (Infos, error) {
 }
 
 // Create adds a new maybe to the database with pre-filled ID and date fields.
-func (r RepositoryDb) Create(nm NewMaybe, userID string) (Info, error) {
+func (r RepositoryDb) Create(nm NewOrUpdateMaybe, userID string) (Info, error) {
 	maybe := Info{
 		ID:          uuid.New().String(),
 		Title:       nm.Title,
@@ -152,4 +152,75 @@ func (r RepositoryDb) Create(nm NewMaybe, userID string) (Info, error) {
 		return Info{}, errors.Wrap(err, "inserting new maybe")
 	}
 	return maybe, nil
+}
+
+// Update updates an existing maybe.
+func (r RepositoryDb) Update(um NewOrUpdateMaybe, maybeID string) error {
+	if _, err := uuid.Parse(maybeID); err != nil {
+		return ErrInvalidID
+	}
+
+	maybe, err := r.QueryByID(maybeID)
+	if err != nil {
+		return errors.Wrap(err, "updating maybe")
+	}
+
+	if um.Title != "" {
+		maybe.Title = um.Title
+	}
+
+	if um.Url != "" {
+		maybe.Url = um.Url
+	}
+
+	if um.Description != "" {
+		maybe.Description = um.Description
+	}
+
+	if um.Tags != nil {
+		maybe.Tags = um.Tags
+
+		// For each tag:
+		// * find the tag's ID in the database OR create a new tag
+		// * create an entry in the linking table.
+		for _, tagName := range maybe.Tags {
+			row := r.Db.QueryRowx("SELECT tag_id FROM tags where name = $1", tagName)
+			var tagID string
+			err := row.Scan(&tagID)
+			if err != nil {
+				// tag does not exist in database, create
+				tagID = uuid.New().String()
+				const q = `
+				INSERT INTO	tags (tag_id, name)
+				VALUES ($1, $2)
+				`
+				if _, err := r.Db.Exec(q, tagID, tagName); err != nil {
+					return ErrInvalidTag
+				}
+			}
+			const q = `
+			INSERT INTO maybetags (maybe_id, tag_id)
+			VALUES ($1, $2)
+			`
+			_, err = r.Db.Exec(q, maybe.ID, tagID)
+			if err != nil {
+				return errors.Wrap(err, "inserting into linking table maybetags")
+			}
+		}
+	}
+
+	const q = `
+	UPDATE maybes
+	SET
+		title = $2,
+		url = $3,
+		description = $4
+	WHERE
+		maybe_id = $1
+	`
+
+	if _, err := r.Db.Exec(q, maybeID, maybe.Title, maybe.Url, maybe.Description); err != nil {
+		return errors.Wrap(err, "updating product")
+	}
+	return nil
 }

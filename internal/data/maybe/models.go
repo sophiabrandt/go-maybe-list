@@ -20,9 +20,10 @@ type Tag struct {
 
 type Infos []Info
 
-// NewMaybe is the data for creating a new maybe.
+// NewOrUpdateMaybe is the data for creating a new maybe
+// or updating an existing maybe.
 // Adding Tags is optional.
-type NewMaybe struct {
+type NewOrUpdateMaybe struct {
 	Title       string
 	Url         string
 	Description string
@@ -32,13 +33,4 @@ type NewMaybe struct {
 // NewTag is the data for creating a new tag.
 type NewTag struct {
 	Name string `db:"name"`
-}
-
-// UpdateMaybe defines the information for updating an existing maybe.
-// Fields are optional.
-type UpdateBook struct {
-	Title       *string
-	Url         *string
-	Description *string
-	Tags        []string
 }
