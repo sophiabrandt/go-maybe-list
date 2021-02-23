@@ -7,10 +7,15 @@
     <div class="center">
         <div class="grid stack">
         {{with .Maybe}}
-          <div class="box stack">
-            <h3>{{.Title}}</h3>
-            <p><a href="{{.Url}}">{{.Url}}</a></p>
-            <p>{{.Description}}</p>
+          <div class="box">
+            <div class="stack mb">
+              <h3>{{.Title}}</h3>
+              <p><a href="{{.Url}}">{{.Url}}</a></p>
+              <p>{{.Description}}</p>
+            </div>
+            {{range .Tags}}
+            <a href="/tags/{{.ID}}" class="tag">#{{.Name}}</a>
+            {{end}}
           </div>
           <div class="cluster center">
             <div>

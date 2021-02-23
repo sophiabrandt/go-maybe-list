@@ -144,7 +144,14 @@ func (mg maybeGroup) updateMaybeForm(e *env.Env, w http.ResponseWriter, r *http.
 	form.Set("title", mb.Title)
 	form.Set("url", mb.Url)
 	form.Set("description", mb.Description)
-	form.Set("tags", strings.Join(mb.Tags[:], ","))
+	// convert tag model into a list of strings for the form
+	if mb.Tags != nil {
+		tagNames := make([]string, len(mb.Tags))
+		for i, tag := range mb.Tags {
+			tagNames[i] = tag.Name
+		}
+		form.Set("tags", strings.Join(tagNames[:], ","))
+	}
 
 	return web.Render(e, w, r, "update.page.tmpl", &data.TemplateData{Maybe: &mb, Form: form}, http.StatusOK)
 }

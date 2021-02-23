@@ -243,6 +243,10 @@ button.danger--button {
   background-color: var(--color-danger);
 }
 
+.tag {
+  text-decoration: underline;
+}
+
 .footer {
   flex-shrink: 0;
   background-color: var(--color-secondary);
@@ -260,4 +264,8 @@ footer:last-child {
 
 .mt {
   margin-top: 1rem;
+}
+
+.mb {
+  margin-bottom: 1rem;
 }

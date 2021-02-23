@@ -54,6 +54,7 @@ func (r RepositoryDb) QueryByID(maybeID string) (Info, error) {
 		return Info{}, ErrInvalidID
 	}
 
+	// Get full details from maybes table
 	const q = `
 	SELECT
 		m.*,
@@ -64,7 +65,6 @@ func (r RepositoryDb) QueryByID(maybeID string) (Info, error) {
 	WHERE
 		m.maybe_id = $1
 	`
-
 	var maybe Info
 	if err := r.Db.Get(&maybe, q, maybeID); err != nil {
 		if err == sql.ErrNoRows {
@@ -72,6 +72,30 @@ func (r RepositoryDb) QueryByID(maybeID string) (Info, error) {
 		}
 		return maybe, errors.Wrapf(err, "selecting maybe with ID %s", maybeID)
 	}
+
+	// Get all tags for the maybe
+	const t = `
+	SELECT t.*
+	FROM tags AS t
+	LEFT JOIN
+		maybetags AS mt ON t.tag_id = mt.tag_id
+	WHERE
+		mt.maybe_id = $1
+	`
+
+	var tags []Tag
+	if err := r.Db.Select(&tags, t, maybeID); err != nil {
+		if err == sql.ErrNoRows {
+			tags = nil
+		}
+		return maybe, errors.Wrapf(err, "selecting tags for maybe with ID %s", maybeID)
+	}
+
+	// if tags exist, add them to the model
+	if tags != nil {
+		maybe.Tags = tags
+	}
+
 	return maybe, nil
 }
 
@@ -109,13 +133,11 @@ func (r RepositoryDb) Create(nm NewOrUpdateMaybe, userID string) (Info, error) {
 		DateUpdated: time.Now().UTC().String(),
 	}
 
-	if nm.Tags != nil {
-		maybe.Tags = nm.Tags
-
+	if len(nm.Tags) != 0 {
 		// For each tag:
 		// * find the tag's ID in the database OR create a new tag
 		// * create an entry in the linking table.
-		for _, tagName := range maybe.Tags {
+		for _, tagName := range nm.Tags {
 			row := r.Db.QueryRowx("SELECT tag_id FROM tags where name = $1", tagName)
 			var tagID string
 			err := row.Scan(&tagID)
@@ -126,12 +148,13 @@ func (r RepositoryDb) Create(nm NewOrUpdateMaybe, userID string) (Info, error) {
 				INSERT INTO	tags (tag_id, name)
 				VALUES ($1, $2)
 				`
-				if _, err := r.Db.Exec(q, tagID, tagName); err != nil {
+				_, err := r.Db.Exec(q, tagID, tagName)
+				if err != nil {
 					return Info{}, ErrInvalidTag
 				}
 			}
 			const q = `
-			INSERT INTO maybetags (maybe_id, tag_id)
+			INSERT OR IGNORE INTO maybetags (maybe_id, tag_id)
 			VALUES ($1, $2)
 			`
 			_, err = r.Db.Exec(q, maybe.ID, tagID)
@@ -177,13 +200,12 @@ func (r RepositoryDb) Update(um NewOrUpdateMaybe, maybeID string) error {
 		maybe.Description = um.Description
 	}
 
-	if um.Tags != nil {
-		maybe.Tags = um.Tags
-
+	// updating/adding new tags
+	if len(um.Tags) != 0 {
 		// For each tag:
 		// * find the tag's ID in the database OR create a new tag
 		// * create an entry in the linking table.
-		for _, tagName := range maybe.Tags {
+		for _, tagName := range um.Tags {
 			row := r.Db.QueryRowx("SELECT tag_id FROM tags where name = $1", tagName)
 			var tagID string
 			err := row.Scan(&tagID)
@@ -199,7 +221,7 @@ func (r RepositoryDb) Update(um NewOrUpdateMaybe, maybeID string) error {
 				}
 			}
 			const q = `
-			INSERT INTO maybetags (maybe_id, tag_id)
+			INSERT OR IGNORE INTO maybetags (maybe_id, tag_id)
 			VALUES ($1, $2)
 			`
 			_, err = r.Db.Exec(q, maybe.ID, tagID)
@@ -207,8 +229,21 @@ func (r RepositoryDb) Update(um NewOrUpdateMaybe, maybeID string) error {
 				return errors.Wrap(err, "inserting into linking table maybetags")
 			}
 		}
+	} else {
+		// if the um.Tags slice contains no values, the user has deleted their tags,
+		const t = `
+	DELETE FROM
+		maybetags
+	WHERE
+		maybetags.maybe_id = $1
+	`
+		_, err = r.Db.Exec(t, maybe.ID)
+		if err != nil {
+			return errors.Wrap(err, "deleting linking table maybetags")
+		}
 	}
 
+	// update the maybe model
 	const q = `
 	UPDATE maybes
 	SET
