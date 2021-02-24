@@ -4,15 +4,19 @@
 
 {{define "main"}}
 <h2 class="center">Latest Entries</h2>
-    {{if .Maybes}}
-    <div class="center">
-        <div class="grid stack">
-          {{range .Maybes}}
-            {{template "maybe" .}}
-          {{end}}
-        </div>
-    </div>
+    {{if .IsAuthenticated}}
+      {{if .Maybes}}
+      <div class="center">
+          <div class="grid stack">
+            {{range .Maybes}}
+              {{template "maybe" .}}
+            {{end}}
+          </div>
+      </div>
+      {{else}}
+        <p class="center">Nothing to see here yet.</p>
+      {{end}}
     {{else}}
     <p class="center">Please <strong><a href="/login">login</a></strong> or <strong><a href="/signup">sign up</a></strong>.</p>
-{{end}}
+    {{end}}
 {{end}}
