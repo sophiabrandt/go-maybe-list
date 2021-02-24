@@ -55,7 +55,7 @@ func (r RepositoryDb) Query(userID string) (Infos, error) {
 }
 
 // QuerybyID retrieves a book by ID from the database.
-func (r RepositoryDb) QueryByID(maybeID string) (Info, error) {
+func (r RepositoryDb) QueryByID(maybeID string, userID string) (Info, error) {
 	if _, err := uuid.Parse(maybeID); err != nil {
 		return Info{}, ErrInvalidID
 	}
@@ -72,11 +72,15 @@ func (r RepositoryDb) QueryByID(maybeID string) (Info, error) {
 		m.maybe_id = $1
 	`
 	var maybe Info
-	if err := r.Db.Get(&maybe, q, maybeID); err != nil {
+	if err := r.Db.Get(&maybe, q, maybeID, userID); err != nil {
 		if err == sql.ErrNoRows {
 			return maybe, ErrNotFound
 		}
 		return maybe, errors.Wrapf(err, "selecting maybe with ID %s", maybeID)
+	}
+
+	if maybe.UserID != userID {
+		return Info{}, ErrForbidden
 	}
 
 	// Get all tags for the maybe
@@ -186,14 +190,23 @@ func (r RepositoryDb) Create(nm NewOrUpdateMaybe, userID string) (Info, error) {
 }
 
 // Update updates an existing maybe.
-func (r RepositoryDb) Update(um NewOrUpdateMaybe, maybeID string) error {
+func (r RepositoryDb) Update(um NewOrUpdateMaybe, maybeID string, userID string) error {
 	if _, err := uuid.Parse(maybeID); err != nil {
 		return ErrInvalidID
 	}
 
-	maybe, err := r.QueryByID(maybeID)
+	maybe, err := r.QueryByID(maybeID, userID)
 	if err != nil {
-		return errors.Wrap(err, "updating maybe")
+		switch errors.Cause(err) {
+		case ErrInvalidID:
+			return ErrInvalidID
+		case ErrForbidden:
+			return ErrForbidden
+		case ErrNotFound:
+			return ErrNotFound
+		default:
+			return errors.Wrap(err, "updating maybe")
+		}
 	}
 
 	if um.Title != "" {

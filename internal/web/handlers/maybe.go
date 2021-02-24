@@ -17,10 +17,10 @@ import (
 type maybeGroup struct {
 	maybe interface {
 		Query(userID string) (maybe.Infos, error)
-		QueryByID(maybeID string) (maybe.Info, error)
+		QueryByID(maybeID string, userID string) (maybe.Info, error)
 		QueryByTitle(title string, userID string) (maybe.Infos, error)
 		Create(nm maybe.NewOrUpdateMaybe, userID string) (maybe.Info, error)
-		Update(um maybe.NewOrUpdateMaybe, maybeID string) error
+		Update(um maybe.NewOrUpdateMaybe, maybeID string, userID string) error
 		Delete(maybeID string) error
 	}
 }
@@ -56,11 +56,15 @@ func (mg maybeGroup) getMaybesQueryFilter(e *env.Env, w http.ResponseWriter, r *
 
 func (mg maybeGroup) getMaybeByID(e *env.Env, w http.ResponseWriter, r *http.Request) error {
 	params := web.Params(r)
-	mb, err := mg.maybe.QueryByID(params["id"])
+	userID := e.Session.GetString(r, "authenticatedUserID")
+
+	mb, err := mg.maybe.QueryByID(params["id"], userID)
 	if err != nil {
 		switch errors.Cause(err) {
 		case maybe.ErrInvalidID:
 			return web.StatusError{Err: err, Code: http.StatusBadRequest}
+		case maybe.ErrForbidden:
+			return web.StatusError{Err: err, Code: http.StatusForbidden}
 		case maybe.ErrNotFound:
 			return web.StatusError{Err: err, Code: http.StatusNotFound}
 		default:
@@ -129,7 +133,9 @@ func (mg maybeGroup) createMaybe(e *env.Env, w http.ResponseWriter, r *http.Requ
 
 func (mg maybeGroup) updateMaybeForm(e *env.Env, w http.ResponseWriter, r *http.Request) error {
 	params := web.Params(r)
-	mb, err := mg.maybe.QueryByID(params["id"])
+	userID := e.Session.GetString(r, "authenticatedUserID")
+
+	mb, err := mg.maybe.QueryByID(params["id"], userID)
 	if err != nil {
 		switch errors.Cause(err) {
 		case maybe.ErrInvalidID:
@@ -190,11 +196,15 @@ func (mg maybeGroup) updateMaybe(e *env.Env, w http.ResponseWriter, r *http.Requ
 		um.Tags = trimT
 	}
 
-	err := mg.maybe.Update(um, params["id"])
+	userID := e.Session.GetString(r, "authenticatedUserID")
+
+	err := mg.maybe.Update(um, params["id"], userID)
 	if err != nil {
 		switch errors.Cause(err) {
 		case maybe.ErrInvalidID:
 			return web.StatusError{Err: err, Code: http.StatusBadRequest}
+		case maybe.ErrForbidden:
+			return web.StatusError{Err: err, Code: http.StatusForbidden}
 		case maybe.ErrNotFound:
 			return web.StatusError{Err: err, Code: http.StatusNotFound}
 		default:
