@@ -18,6 +18,9 @@ var (
 
 	// ErrInvalidTag occurs when a tag cannot be found in the dabase and cannot be created.
 	ErrInvalidTag = errors.New("tag not found")
+
+	// ErrForbidden occurs when a user tries to do something that is forbidden to them according to access control policies.
+	ErrForbidden = errors.New("attempted action is not allowed")
 )
 
 // RepositoryDb defines the repository for the book service.
@@ -30,8 +33,8 @@ func New(db *sqlx.DB) RepositoryDb {
 	return RepositoryDb{Db: db}
 }
 
-// Query retrieves all maybes from the database.
-func (r RepositoryDb) Query() (Infos, error) {
+// Query retrieves all maybes from the database for the current user.
+func (r RepositoryDb) Query(userID string) (Infos, error) {
 	const q = `
 	SELECT
 		m.*,
@@ -39,10 +42,13 @@ func (r RepositoryDb) Query() (Infos, error) {
 	FROM maybes as m
 	LEFT JOIN
 		users AS u ON m.user_id = u.user_id
-	ORDER BY m.maybe_id
+	WHERE
+		u.user_id = $1
+	ORDER BY
+		m.maybe_id
 	`
 	var maybes Infos
-	if err := r.Db.Select(&maybes, q); err != nil {
+	if err := r.Db.Select(&maybes, q, userID); err != nil {
 		return maybes, errors.Wrap(err, "selecting maybes")
 	}
 	return maybes, nil
@@ -100,7 +106,7 @@ func (r RepositoryDb) QueryByID(maybeID string) (Info, error) {
 }
 
 // QuerybyTitle retrieves an entry by quering the title from the database.
-func (r RepositoryDb) QueryByTitle(title string) (Infos, error) {
+func (r RepositoryDb) QueryByTitle(title string, userID string) (Infos, error) {
 	const q = `
 	SELECT
 		m.*,
@@ -110,9 +116,11 @@ func (r RepositoryDb) QueryByTitle(title string) (Infos, error) {
 		users AS u ON m.user_id = u.user_id
 	WHERE
 		m.title LIKE '%' || $1 || '%'
+		AND
+		u.user_id = $2
 	`
 	var maybes Infos
-	if err := r.Db.Select(&maybes, q, title); err != nil {
+	if err := r.Db.Select(&maybes, q, title, userID); err != nil {
 		if err == sql.ErrNoRows {
 			return maybes, ErrNotFound
 		}

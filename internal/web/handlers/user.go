@@ -83,6 +83,12 @@ func (ug userGroup) login(e *env.Env, w http.ResponseWriter, r *http.Request) er
 
 	e.Session.Put(r, "authenticatedUserID", id)
 
+	path := e.Session.PopString(r, "redirectPathAfterLogin")
+	if path != "" {
+		http.Redirect(w, r, path, http.StatusSeeOther)
+		return nil
+	}
+
 	http.Redirect(w, r, "/maybes", http.StatusSeeOther)
 	return nil
 }
