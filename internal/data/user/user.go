@@ -26,6 +26,9 @@ var (
 	// ErrAuthenticationFailure occurs when a user attempts to authenticate but
 	// anything goes wrong.
 	ErrAuthenticationFailure = errors.New("authentication failed")
+
+	// ErrForbidden occurs when a user tries to do something that is forbidden to them according to access control policies.
+	ErrForbidden = errors.New("attempted action is not allowed")
 )
 
 // RepositoryDb defines the repository for the book service.
@@ -39,8 +42,8 @@ func New(db *sqlx.DB) RepositoryDb {
 }
 
 // QueryByID gets the specified user from the database.
-func (r RepositoryDb) QueryByID(id string) (Info, error) {
-	if _, err := uuid.Parse(id); err != nil {
+func (r RepositoryDb) QueryByID(userID string) (Info, error) {
+	if _, err := uuid.Parse(userID); err != nil {
 		return Info{}, ErrInvalidID
 	}
 
@@ -53,11 +56,11 @@ func (r RepositoryDb) QueryByID(id string) (Info, error) {
 		user_id = $1`
 
 	var usr Info
-	if err := r.Db.Get(&usr, q, id); err != nil {
+	if err := r.Db.Get(&usr, q, userID); err != nil {
 		if err == sql.ErrNoRows {
 			return Info{}, ErrNotFound
 		}
-		return Info{}, errors.Wrapf(err, "selecting user %q", id)
+		return Info{}, errors.Wrapf(err, "selecting user %q", userID)
 	}
 
 	return usr, nil

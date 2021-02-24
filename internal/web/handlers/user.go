@@ -13,7 +13,7 @@ import (
 
 type userGroup struct {
 	user interface {
-		QueryByID(id string) (user.Info, error)
+		QueryByID(userID string) (user.Info, error)
 		Create(user user.NewUser) (user.Info, error)
 		Authenticate(email, password string) (string, error)
 	}
@@ -91,4 +91,21 @@ func (ug userGroup) login(e *env.Env, w http.ResponseWriter, r *http.Request) er
 
 	http.Redirect(w, r, "/maybes", http.StatusSeeOther)
 	return nil
+}
+
+func (ug userGroup) profile(e *env.Env, w http.ResponseWriter, r *http.Request) error {
+	params := web.Params(r)
+	userID := e.Session.GetString(r, "authenticatedUserID")
+
+	usr, err := ug.user.QueryByID(userID)
+	if err != nil {
+		switch errors.Cause(err) {
+		case user.ErrNotFound:
+			return web.StatusError{Err: err, Code: http.StatusNotFound}
+		default:
+			return errors.Wrapf(err, "ID : %s", params["id"])
+		}
+	}
+
+	return web.Render(e, w, r, "profile.page.tmpl", &data.TemplateData{User: &usr}, http.StatusOK)
 }

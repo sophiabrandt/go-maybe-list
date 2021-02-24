@@ -11,11 +11,6 @@ import (
 	"github.com/sophiabrandt/go-maybe-list/internal/env"
 )
 
-// HumanDate returns time in YYYY-MM-DD format
-func HumanDate(t time.Time) string {
-	return t.Format("2006-01-02")
-}
-
 // addDefaultData adds data for all templates
 func addDefaultData(e *env.Env, r *http.Request, dt *data.TemplateData) *data.TemplateData {
 	if dt == nil {

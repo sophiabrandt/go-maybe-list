@@ -49,6 +49,7 @@ func New(e *env.Env, db *sqlx.DB) http.Handler {
 	r.Handler(http.MethodGet, "/users/login", dynamicMiddleware.Then(web.Handler{e, ug.loginForm}))
 	r.Handler(http.MethodPost, "/users/login", dynamicMiddleware.Then(web.Handler{e, ug.login}))
 	r.Handler(http.MethodPost, "/users/logout", dynamicMiddleware.Append(mid.RequireAuthentication(e)).Then(web.Handler{e, ug.logout}))
+	r.Handler(http.MethodGet, "/users/profile", dynamicMiddleware.Append(mid.RequireAuthentication(e)).Then(web.Handler{e, ug.profile}))
 
 	// fileServer
 	fileServer := http.FileServer(web.NeuteredFileSystem{http.Dir("./ui/static/")})

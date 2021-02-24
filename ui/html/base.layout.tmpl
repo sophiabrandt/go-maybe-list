@@ -19,10 +19,15 @@
           <a href="/">Home</a>
           {{if .IsAuthenticated}}
           <a href="/maybes/new">New Maybe</a>
-          <form action="/users/logout" method="POST">
-              <input type="hidden" name="csrf_token" value="{{.CSRFToken}}">
-              <button>Logout</button>
-          </form>
+          {{end}}
+          </div>
+          <div>
+            {{if .IsAuthenticated}}
+            <a href="/users/profile/">Profile</a>
+            <form action="/users/logout" method="POST">
+                <input type="hidden" name="csrf_token" value="{{.CSRFToken}}">
+                <button>Logout</button>
+            </form>
           {{else}}
           <a href="/users/signup">Signup</a>
           <a href="/users/login">Login</a>

@@ -1,0 +1,25 @@
+{{template "base" .}}
+
+{{define "title"}}Home{{end}}
+
+{{define "main"}}
+<h2 class="center">User Profile</h2>
+    {{with .User}}
+     <table>
+        <tr>
+            <th>Name</th>
+            <td>{{.Name}}</td>
+        </tr>
+        <tr>
+            <th>Email</th>
+            <td>{{.Email}}</td>
+        </tr>
+        <tr>
+            <th>Joined</th>
+            <td>{{humanDate .DateCreated}}</td>
+        </tr>
+    </table>
+    {{else}}
+    <p class="center">Please <strong><a href="/users/login">login</a></strong> or <strong><a href="/users/signup">sign up</a></strong>.</p>
+    {{end}}
+{{end}}
