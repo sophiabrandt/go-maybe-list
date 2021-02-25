@@ -135,3 +135,48 @@ func (r RepositoryDb) Authenticate(email, password string) (string, error) {
 
 	return id, nil
 }
+
+func (r RepositoryDb) ChangePassword(currentPassword, newPassword, userID string) error {
+	var currentPasswordHash []byte
+	const p = `
+	SELECT password_hash
+	FROM users
+	WHERE user_id = $1
+	`
+
+	if err := r.Db.Get(&currentPasswordHash, p, userID); err != nil {
+		if err == sql.ErrNoRows {
+			return ErrNotFound
+		}
+		return errors.Wrapf(err, "selecting hashed password for %q", userID)
+	}
+
+	err := bcrypt.CompareHashAndPassword(currentPasswordHash, []byte(currentPassword))
+	if err != nil {
+		if errors.Is(err, bcrypt.ErrMismatchedHashAndPassword) {
+			return ErrAuthenticationFailure
+		} else {
+			return err
+		}
+	}
+
+	newPasswordHash, err := bcrypt.GenerateFromPassword([]byte(newPassword), bcrypt.DefaultCost)
+	if err != nil {
+		return errors.Wrap(err, "generating password hash")
+	}
+
+	const q = `
+	UPDATE
+		users
+	SET
+		password_hash = $2
+	WHERE
+		user_id = $1
+	`
+
+	if _, err := r.Db.Exec(q, userID, newPasswordHash); err != nil {
+		return errors.Wrapf(err, "updating password for user %q", userID)
+	}
+
+	return nil
+}

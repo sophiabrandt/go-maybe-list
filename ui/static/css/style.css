@@ -83,15 +83,20 @@ p {
 
 .wrapper {
   padding: var(--s-0);
-  position: relative;
 }
 
-.wrapper__center {
-  max-width: 70rem;
-  padding: var(--s-0);
+.wrapper__medium {
   margin-left: auto;
   margin-right: auto;
   position: relative;
+  max-width: 95%;
+}
+
+.wrapper__small {
+  margin-left: auto;
+  margin-right: auto;
+  position: relative;
+  max-width: 60rem;
 }
 
 .center {
@@ -159,6 +164,7 @@ p {
 
 form label {
   display: inline-block;
+  width: 100%;
 }
 
 form input {
@@ -178,7 +184,7 @@ form input {
 }
 
 textarea {
-  max-width: 95%;
+  width: 100%;
 }
 
 input, textarea {
@@ -285,11 +291,14 @@ table {
     color: var(--color-tertiary);
     border: 1px solid var(--color-neutral);
     border-collapse: collapse;
+    table-layout: fixed;
+    width: 100%;
 }
 
 td, th {
     text-align: left;
     padding: 0.4rem;
+    word-wrap: break-word;
 }
 
 th:last-child, td:last-child {

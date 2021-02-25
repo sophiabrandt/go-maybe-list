@@ -16,6 +16,7 @@ type userGroup struct {
 		QueryByID(userID string) (user.Info, error)
 		Create(user user.NewUser) (user.Info, error)
 		Authenticate(email, password string) (string, error)
+		ChangePassword(currentPassword, newPassword, userID string) error
 	}
 }
 
@@ -108,4 +109,39 @@ func (ug userGroup) profile(e *env.Env, w http.ResponseWriter, r *http.Request) 
 	}
 
 	return web.Render(e, w, r, "profile.page.tmpl", &data.TemplateData{User: &usr}, http.StatusOK)
+}
+
+func (ug userGroup) changePasswordForm(e *env.Env, w http.ResponseWriter, r *http.Request) error {
+	return web.Render(e, w, r, "changepassword.page.tmpl", &data.TemplateData{Form: forms.New(nil)}, http.StatusOK)
+}
+
+func (ug userGroup) changePassword(e *env.Env, w http.ResponseWriter, r *http.Request) error {
+	form := forms.New(r.PostForm)
+	form.Required("current password", "password", "confirm password")
+	form.SecurePassword("password")
+	form.IsEqualString("password", "confirm password")
+
+	if !form.Valid() {
+		return web.Render(e, w, r, "changepassword.page.tmpl", &data.TemplateData{Form: form}, http.StatusUnprocessableEntity)
+	}
+
+	userID := e.Session.GetString(r, "authenticatedUserID")
+
+	err := ug.user.ChangePassword(form.Get("current password"), form.Get("password"), userID)
+	if err != nil {
+		switch errors.Cause(err) {
+		case user.ErrNotFound:
+			return web.StatusError{Err: err, Code: http.StatusNotFound}
+		case user.ErrAuthenticationFailure:
+			form.Errors.Add("current password", "Current password is incorrect")
+			return web.Render(e, w, r, "changepassword.page.tmpl", &data.TemplateData{Form: form}, http.StatusUnprocessableEntity)
+		default:
+			return errors.Wrapf(err, "ID : %s", userID)
+		}
+	}
+
+	e.Session.Put(r, "flash", "Password successfully updated!")
+
+	http.Redirect(w, r, "/users/profile", http.StatusSeeOther)
+	return nil
 }

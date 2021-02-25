@@ -3,9 +3,9 @@
 {{define "title"}}Home{{end}}
 
 {{define "main"}}
-<h2 class="wrapper center">User Profile</h2>
+<h2 class="center">User Profile</h2>
     {{with .User}}
-     <table>
+     <table class="wrapper__small">
         <tr>
             <th>Name</th>
             <td>{{.Name}}</td>
@@ -17,6 +17,10 @@
         <tr>
             <th>Joined</th>
             <td>{{humanDate .DateCreated}}</td>
+        </tr>
+        <tr>
+            <th>Password</th>
+            <td><a href="/users/change-password">Change password</a></td>
         </tr>
     </table>
     {{else}}
