@@ -18,10 +18,10 @@
         <div>
           <a href="/">Home</a>
           {{if .IsAuthenticated}}
-          <a href="/maybes/new">New Maybe</a>
+          <a href="/maybes/new">New</a>
           {{end}}
-          </div>
-          <div>
+        </div>
+        <div class="cluster">
             {{if .IsAuthenticated}}
             <a href="/users/profile/">Profile</a>
             <form action="/users/logout" method="POST">
@@ -34,7 +34,7 @@
           {{end}}
         </div>
       </nav>
-      <main class="wrapper stack main__content">
+      <main class="wrapper__center stack main__content">
         {{with .Flash}}
           <div class="flash">{{.}}</div>
         {{end}}

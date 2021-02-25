@@ -4,8 +4,8 @@
   font-family: "Roboto Mono", sans-serif;
   --ratio: 1.5;
   --s-2: calc(var(--s-1) / var(--ratio));
-  --s-1: calc(var(--s0) / var(--ratio));
-  --s0: 1rem;
+  --s-1: calc(var(--s-0) / var(--ratio));
+  --s-0: 1rem;
   --measure: 60ch;
   --color-background: #fdfffc;
   --color-dark: #290149;
@@ -25,6 +25,7 @@
     --color-background: #0a131f;
     --color-dark: #f1faee;
     --color-light: #290149;
+    --color-secondary: #e2cc7c;
   }
 }
 
@@ -81,8 +82,13 @@ p {
 }
 
 .wrapper {
+  padding: var(--s-0);
+  position: relative;
+}
+
+.wrapper__center {
   max-width: 70rem;
-  padding: 1rem;
+  padding: var(--s-0);
   margin-left: auto;
   margin-right: auto;
   position: relative;
@@ -113,7 +119,7 @@ p {
 }
 
 .box {
-  padding: var(--s0);
+  padding: var(--s-0);
   color: var(--color-dark);
   background-color: var(--color-light);
 }
@@ -127,7 +133,11 @@ p {
 }
 
 .cluster {
-  --space: 1rem;
+  --space: var(--s-0);
+  display: flex;
+  flex-wrap: wrap;
+  flex-direction: row;
+  justify-content: space-between;
   overflow: hidden;
 }
 
@@ -162,7 +172,7 @@ form input {
 
 .form-background {
   background: var(--color-light);
-  padding: 1rem;
+  padding: var(--s-0);
   color: var(--color-dark);
   border-radius: 5px;
 }
@@ -194,7 +204,7 @@ input[type="submit"] {
   color: var(--color-dark);
   font-weight: bold;
   text-align: center;
-  padding: 1rem;
+  padding: var(--s-0);
   width: 100%;
   background-color: var(--color-flash);
 }
@@ -203,7 +213,7 @@ div.error {
   color: #f1faee;
   font-weight: bold;
   text-align: center;
-  padding: 1rem;
+  padding: var(--s-0);
   width: 100%;
   background-color: var(--color-error);
 }
@@ -263,9 +273,30 @@ footer:last-child {
 }
 
 .mt {
-  margin-top: 1rem;
+  margin-top: var(--s-0);
 }
 
 .mb {
-  margin-bottom: 1rem;
+  margin-bottom: var(--s-0);
+}
+
+table {
+    background: var(--color-background);
+    color: var(--color-tertiary);
+    border: 1px solid var(--color-neutral);
+    border-collapse: collapse;
+}
+
+td, th {
+    text-align: left;
+    padding: 0.4rem;
+}
+
+th:last-child, td:last-child {
+    text-align: right;
+    color: var(--color-neutral);
+}
+
+tr:nth-child(2n) {
+    background-color: var(--color-light);
 }
