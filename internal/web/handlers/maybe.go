@@ -20,6 +20,7 @@ type maybeGroup struct {
 		QueryByID(maybeID, userID string) (maybe.Info, error)
 		QueryByTitle(title, userID string) (maybe.Infos, error)
 		QueryByTag(maybeID, userID string) (maybe.Infos, error)
+		QueryTags(userID string) (maybe.Tags, error)
 		Create(nm maybe.NewOrUpdateMaybe, userID string) (maybe.Info, error)
 		Update(um maybe.NewOrUpdateMaybe, maybeID string, userID string) error
 		Delete(maybeID string) error
@@ -263,4 +264,19 @@ func (mg maybeGroup) deleteMaybe(e *env.Env, w http.ResponseWriter, r *http.Requ
 
 	http.Redirect(w, r, "/maybes", http.StatusSeeOther)
 	return nil
+}
+
+func (mg maybeGroup) getAllTags(e *env.Env, w http.ResponseWriter, r *http.Request) error {
+	userID := e.Session.GetString(r, "authenticatedUserID")
+
+	tags, err := mg.maybe.QueryTags(userID)
+	if err != nil {
+		switch errors.Cause(err) {
+		case maybe.ErrNotFound:
+			return web.StatusError{Err: err, Code: http.StatusNotFound}
+		default:
+			return web.StatusError{Err: err, Code: http.StatusInternalServerError}
+		}
+	}
+	return web.Render(e, w, r, "tag.page.tmpl", &data.TemplateData{Tags: tags}, http.StatusOK)
 }

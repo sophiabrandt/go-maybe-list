@@ -1,0 +1,20 @@
+{{template "base" .}}
+
+{{define "title"}}Tags{{end}}
+
+{{define "main"}}
+<h2 class="center">All Tags</h2>
+    {{if .Tags}}
+    <div class="center">
+        <div class="cluster">
+          <div>
+            {{range .Tags}}
+            <a href="/tags/{{.ID}}">{{.Name}}</a>
+            {{end}}
+          </div>
+        </div>
+    </div>
+    {{else}}
+    <p class="center">No tags available. Create a <a href="/maybes/new">new maybe with tags</a>?</p>
+{{end}}
+{{end}}

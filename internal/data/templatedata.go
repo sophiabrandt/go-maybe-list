@@ -11,7 +11,7 @@ type TemplateData struct {
 	Maybe           *maybe.Info
 	Maybes          maybe.Infos
 	Tag             *maybe.Tag
-	Tags            []*maybe.Tag
+	Tags            maybe.Tags
 	User            *user.Info
 	Form            *forms.Form
 	Flash           string

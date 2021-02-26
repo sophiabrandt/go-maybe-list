@@ -6,6 +6,8 @@ type Tag struct {
 	Name string `db:"name"`
 }
 
+type Tags []Tag
+
 // Info is the model for maybes.
 type Info struct {
 	ID          string `db:"maybe_id"`

@@ -39,6 +39,7 @@ func New(e *env.Env, db *sqlx.DB) http.Handler {
 	r.Handler(http.MethodPost, "/maybes/:id/delete", dynamicMiddleware.Append(mid.RequireAuthentication(e)).Then(web.Handler{e, mg.deleteMaybe}))
 	r.Handler(http.MethodGet, "/maybes/:id/update", dynamicMiddleware.Append(mid.RequireAuthentication(e)).Then(web.Handler{e, mg.updateMaybeForm}))
 	r.Handler(http.MethodPost, "/maybes/:id/update", dynamicMiddleware.Append(mid.RequireAuthentication(e)).Then(web.Handler{e, mg.updateMaybe}))
+	r.Handler(http.MethodGet, "/tags", dynamicMiddleware.Append(mid.RequireAuthentication(e)).Then(web.Handler{e, mg.getAllTags}))
 	r.Handler(http.MethodGet, "/tags/:id", dynamicMiddleware.Append(mid.RequireAuthentication(e)).Then(web.Handler{e, mg.getMaybesByTag}))
 
 	// user

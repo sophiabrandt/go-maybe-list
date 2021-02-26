@@ -63,8 +63,10 @@ CREATE UNIQUE INDEX idx_tag_names ON tags(name);
 -- Linking table for many-to-many relationship between Tag and Maybe
 CREATE TABLE maybetags (
 	maybe_id       UUID,
+	user_id		   UUID,
 	tag_id         UUID,
 FOREIGN KEY(maybe_id) REFERENCES maybe(maybe_id),
+FOREIGN KEY(user_id) REFERENCES users(user_id),
 FOREIGN KEY(tag_id) REFERENCES tags(tag_id),
 UNIQUE(maybe_id, tag_id)
 )

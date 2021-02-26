@@ -131,7 +131,7 @@ func (r RepositoryDb) QueryByTag(tagID string, userID string) (Infos, error) {
 	LEFT JOIN
 		tags AS t ON mt.tag_id = t.tag_id
 	WHERE
-		t.tag_id = $1 AND u.user_id = $2
+		t.tag_id = $1 AND mt.user_id = $2
 	ORDER BY
 		m.maybe_id
 	`
@@ -200,10 +200,10 @@ func (r RepositoryDb) Create(nm NewOrUpdateMaybe, userID string) (Info, error) {
 				}
 			}
 			const q = `
-			INSERT OR IGNORE INTO maybetags (maybe_id, tag_id)
-			VALUES ($1, $2)
+			INSERT OR IGNORE INTO maybetags (maybe_id, user_id, tag_id)
+			VALUES ($1, $2, $3)
 			`
-			_, err = r.Db.Exec(q, maybe.ID, tagID)
+			_, err = r.Db.Exec(q, maybe.ID, userID, tagID)
 			if err != nil {
 				return Info{}, errors.Wrap(err, "inserting into linking table maybetags")
 			}
@@ -275,23 +275,54 @@ func (r RepositoryDb) Update(um NewOrUpdateMaybe, maybeID string, userID string)
 					return ErrInvalidTag
 				}
 			}
+
+			// insert new tags into the linking table for the maybe
 			const q = `
-			INSERT OR IGNORE INTO maybetags (maybe_id, tag_id)
-			VALUES ($1, $2)
+			INSERT OR IGNORE INTO
+				maybetags (maybe_id, user_id, tag_id)
+			VALUES
+				($1, $2, $3)
 			`
-			_, err = r.Db.Exec(q, maybe.ID, tagID)
+			_, err = r.Db.Exec(q, maybe.ID, userID, tagID)
 			if err != nil {
 				return errors.Wrap(err, "inserting into linking table maybetags")
 			}
 		}
+
+		// delete tags that don't exist anymore
+		const d = `
+			DELETE FROM
+				maybetags 
+			WHERE tag_id IN (
+				SELECT
+					mt.tag_id
+				FROM
+					maybetags AS mt
+				LEFT JOIN
+					tags AS t ON t.tag_id = mt.tag_id
+				WHERE
+					t.name NOT IN (?)
+				)
+		`
+		// convert query to allow variadic arguments
+		// https://jmoiron.github.io/sqlx/#inQueries
+		query, args, err := sqlx.In(d, um.Tags)
+		if err != nil {
+			return errors.Wrap(err, "deleting tags from liking table, query error")
+		}
+		query = r.Db.Rebind(query)
+		_, err = r.Db.Exec(query, args...)
+		if err != nil {
+			return errors.Wrapf(err, "deleting tags from linking table maybetags for: %q", um.Tags)
+		}
 	} else {
 		// if the um.Tags slice contains no values, the user has deleted their tags,
 		const t = `
-	DELETE FROM
-		maybetags
-	WHERE
-		maybetags.maybe_id = $1
-	`
+		DELETE FROM
+			maybetags
+		WHERE
+			maybe_id = $1
+		`
 		_, err = r.Db.Exec(t, maybe.ID)
 		if err != nil {
 			return errors.Wrap(err, "deleting linking table maybetags")
@@ -304,12 +335,12 @@ func (r RepositoryDb) Update(um NewOrUpdateMaybe, maybeID string, userID string)
 	SET
 		title = $2,
 		url = $3,
-		description = $4
+		description = $4,
+		updated_at = $5
 	WHERE
 		maybe_id = $1
 	`
-
-	if _, err := r.Db.Exec(q, maybeID, maybe.Title, maybe.Url, maybe.Description); err != nil {
+	if _, err := r.Db.Exec(q, maybeID, maybe.Title, maybe.Url, maybe.Description, time.Now().UTC().String()); err != nil {
 		return errors.Wrap(err, "updating product")
 	}
 	return nil
@@ -333,4 +364,30 @@ func (r RepositoryDb) Delete(maybeID string) error {
 	}
 
 	return nil
+}
+
+// QueryTags returns all tags for a given user.
+func (r RepositoryDb) QueryTags(userID string) (Tags, error) {
+	const q = `
+	SELECT
+		t.*
+	FROM
+		tags AS t
+	LEFT JOIN
+		maybetags AS mt ON mt.tag_id = t.tag_id
+	WHERE
+		mt.user_id = $1
+	ORDER BY
+		t.tag_id
+	`
+
+	var tags Tags
+	if err := r.Db.Select(&tags, q, userID); err != nil {
+		if err == sql.ErrNoRows {
+			return tags, ErrNotFound
+		}
+		return tags, errors.Wrap(err, "selecting tags")
+	}
+
+	return tags, nil
 }
