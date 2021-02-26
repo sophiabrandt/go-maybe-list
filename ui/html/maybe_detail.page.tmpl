@@ -4,29 +4,31 @@
 
 {{define "main"}}
 {{$csrf_token := .CSRFToken}}
-    <div class="center">
-        <div class="grid stack">
-        {{with .Maybe}}
-          <div class="box">
-            <div class="stack mb">
-              <h3>{{.Title}}</h3>
-              <p><a href="{{.Url}}">{{.Url}}</a></p>
-              <p>{{.Description}}</p>
-            </div>
-            {{range .Tags}}
-            <a href="/tags/{{.ID}}" class="tag">#{{.Name}}</a>
-            {{end}}
-          </div>
-          <div class="cluster center">
-            <div>
-              <a href="/maybes/{{.ID}}/update"><button>Update 🖉</button></a>
-            </div>
-              <form action="/maybes/{{.ID}}/delete" method="POST">
-                <input type="hidden" name="csrf_token" value="{{$csrf_token}}">
-                  <button class="danger--button" type="submit">Delete ⚠️</button>
-              </form>
-          </div>
-        {{end}}
+  <div class="center">
+    <div class="grid stack">
+      {{with .Maybe}}
+      <div class="box">
+        <div class="stack mb">
+          <h3>{{.Title}}</h3>
+          <p><a href="{{.Url}}">{{.Url}}</a></p>
+          <p>{{.Description}}</p>
         </div>
+        {{range .Tags}}
+        <a href="/tags/{{.ID}}" class="tag">#{{.Name}}</a>
+        {{end}}
+      </div>
+      <div class="cluster center">
+        <div>
+          <div>
+            <a href="/maybes/{{.ID}}/update"><button>Update 🖉</button></a>
+          </div>
+          <form action="/maybes/{{.ID}}/delete" method="POST">
+            <input type="hidden" name="csrf_token" value="{{$csrf_token}}" />
+            <button class="danger--button" type="submit">Delete ⚠️</button>
+          </form>
+        </div>
+      </div>
+      {{end}}
     </div>
+  </div>
 {{end}}

@@ -17,8 +17,9 @@ import (
 type maybeGroup struct {
 	maybe interface {
 		Query(userID string) (maybe.Infos, error)
-		QueryByID(maybeID string, userID string) (maybe.Info, error)
-		QueryByTitle(title string, userID string) (maybe.Infos, error)
+		QueryByID(maybeID, userID string) (maybe.Info, error)
+		QueryByTitle(title, userID string) (maybe.Infos, error)
+		QueryByTag(maybeID, userID string) (maybe.Infos, error)
 		Create(nm maybe.NewOrUpdateMaybe, userID string) (maybe.Info, error)
 		Update(um maybe.NewOrUpdateMaybe, maybeID string, userID string) error
 		Delete(maybeID string) error
@@ -29,7 +30,31 @@ func (mg maybeGroup) getAllMaybes(e *env.Env, w http.ResponseWriter, r *http.Req
 	userID := e.Session.GetString(r, "authenticatedUserID")
 	maybes, err := mg.maybe.Query(userID)
 	if err != nil {
-		return web.StatusError{Err: err, Code: http.StatusInternalServerError}
+		switch errors.Cause(err) {
+		case maybe.ErrNotFound:
+			return web.StatusError{Err: err, Code: http.StatusNotFound}
+		default:
+			return web.StatusError{Err: err, Code: http.StatusInternalServerError}
+		}
+	}
+
+	return web.Render(e, w, r, "home.page.tmpl", &data.TemplateData{Maybes: maybes}, http.StatusOK)
+}
+
+func (mg maybeGroup) getMaybesByTag(e *env.Env, w http.ResponseWriter, r *http.Request) error {
+	params := web.Params(r)
+	userID := e.Session.GetString(r, "authenticatedUserID")
+
+	maybes, err := mg.maybe.QueryByTag(params["id"], userID)
+	if err != nil {
+		switch errors.Cause(err) {
+		case maybe.ErrInvalidTag:
+			return web.StatusError{Err: err, Code: http.StatusBadRequest}
+		case maybe.ErrNotFound:
+			return web.StatusError{Err: err, Code: http.StatusNotFound}
+		default:
+			return web.StatusError{Err: err, Code: http.StatusInternalServerError}
+		}
 	}
 
 	return web.Render(e, w, r, "home.page.tmpl", &data.TemplateData{Maybes: maybes}, http.StatusOK)

@@ -49,6 +49,9 @@ func (r RepositoryDb) Query(userID string) (Infos, error) {
 	`
 	var maybes Infos
 	if err := r.Db.Select(&maybes, q, userID); err != nil {
+		if err == sql.ErrNoRows {
+			return maybes, ErrNotFound
+		}
 		return maybes, errors.Wrap(err, "selecting maybes")
 	}
 	return maybes, nil
@@ -109,6 +112,36 @@ func (r RepositoryDb) QueryByID(maybeID string, userID string) (Info, error) {
 	return maybe, nil
 }
 
+// QueryByTag queries the database for all maybes of a certain tag for the current user.
+func (r RepositoryDb) QueryByTag(tagID string, userID string) (Infos, error) {
+	var maybes Infos
+	if _, err := uuid.Parse(tagID); err != nil {
+		return maybes, ErrInvalidTag
+	}
+
+	const q = `
+	SELECT
+		m.*,
+		u.user_id AS user_id
+	FROM maybes as m
+	LEFT JOIN
+		users AS u ON m.user_id = u.user_id
+	LEFT JOIN
+		maybetags as mt ON m.maybe_id = mt.maybe_id
+	LEFT JOIN
+		tags AS t ON mt.tag_id = t.tag_id
+	WHERE
+		t.tag_id = $1 AND u.user_id = $2
+	ORDER BY
+		m.maybe_id
+	`
+	if err := r.Db.Select(&maybes, q, tagID, userID); err != nil {
+		return maybes, errors.Wrapf(err, "selecting maybes by tag %q", tagID)
+	}
+
+	return maybes, nil
+}
+
 // QuerybyTitle retrieves an entry by quering the title from the database.
 func (r RepositoryDb) QueryByTitle(title string, userID string) (Infos, error) {
 	const q = `
@@ -130,6 +163,7 @@ func (r RepositoryDb) QueryByTitle(title string, userID string) (Infos, error) {
 		}
 		return maybes, errors.Wrap(err, "selecting maybes by title")
 	}
+
 	return maybes, nil
 }
 
