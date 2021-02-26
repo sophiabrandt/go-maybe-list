@@ -18,7 +18,6 @@ type maybeGroup struct {
 	maybe interface {
 		Query(userID string) (maybe.Infos, error)
 		QueryByID(maybeID, userID string) (maybe.Info, error)
-		QueryByTitle(title, userID string) (maybe.Infos, error)
 		QueryByTag(maybeID, userID string) (maybe.Infos, error)
 		QueryTags(userID string) (maybe.Tags, error)
 		Create(nm maybe.NewOrUpdateMaybe, userID string) (maybe.Info, error)
@@ -31,12 +30,7 @@ func (mg maybeGroup) getAllMaybes(e *env.Env, w http.ResponseWriter, r *http.Req
 	userID := e.Session.GetString(r, "authenticatedUserID")
 	maybes, err := mg.maybe.Query(userID)
 	if err != nil {
-		switch errors.Cause(err) {
-		case maybe.ErrNotFound:
-			return web.StatusError{Err: err, Code: http.StatusNotFound}
-		default:
-			return web.StatusError{Err: err, Code: http.StatusInternalServerError}
-		}
+		return web.StatusError{Err: err, Code: http.StatusInternalServerError}
 	}
 
 	return web.Render(e, w, r, "home.page.tmpl", &data.TemplateData{Maybes: maybes}, http.StatusOK)
@@ -59,25 +53,6 @@ func (mg maybeGroup) getMaybesByTag(e *env.Env, w http.ResponseWriter, r *http.R
 	}
 
 	return web.Render(e, w, r, "home.page.tmpl", &data.TemplateData{Maybes: maybes}, http.StatusOK)
-}
-
-func (mg maybeGroup) getMaybesQueryFilter(e *env.Env, w http.ResponseWriter, r *http.Request) error {
-	title, err := url.QueryUnescape(r.URL.Query().Get("title"))
-	userID := e.Session.GetString(r, "authenticatedUserID")
-	if err != nil {
-		return web.StatusError{Err: err, Code: http.StatusBadRequest}
-	}
-	maybes, err := mg.maybe.QueryByTitle(title, userID)
-	if err != nil {
-		switch errors.Cause(err) {
-		case maybe.ErrNotFound:
-			return web.StatusError{Err: err, Code: http.StatusNotFound}
-		default:
-			return errors.Wrapf(err, "Query Path: %s, Title: %s", r.URL.EscapedPath(), title)
-		}
-	}
-
-	return web.Render(e, w, r, "maybe.page.tmpl", &data.TemplateData{Maybes: maybes}, http.StatusOK)
 }
 
 func (mg maybeGroup) getMaybeByID(e *env.Env, w http.ResponseWriter, r *http.Request) error {
@@ -228,6 +203,8 @@ func (mg maybeGroup) updateMaybe(e *env.Env, w http.ResponseWriter, r *http.Requ
 	if err != nil {
 		switch errors.Cause(err) {
 		case maybe.ErrInvalidID:
+			return web.StatusError{Err: err, Code: http.StatusBadRequest}
+		case maybe.ErrInvalidTag:
 			return web.StatusError{Err: err, Code: http.StatusBadRequest}
 		case maybe.ErrForbidden:
 			return web.StatusError{Err: err, Code: http.StatusForbidden}

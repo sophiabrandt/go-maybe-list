@@ -49,9 +49,6 @@ func (r RepositoryDb) Query(userID string) (Infos, error) {
 	`
 	var maybes Infos
 	if err := r.Db.Select(&maybes, q, userID); err != nil {
-		if err == sql.ErrNoRows {
-			return maybes, ErrNotFound
-		}
 		return maybes, errors.Wrap(err, "selecting maybes")
 	}
 	return maybes, nil
@@ -137,31 +134,6 @@ func (r RepositoryDb) QueryByTag(tagID string, userID string) (Infos, error) {
 	`
 	if err := r.Db.Select(&maybes, q, tagID, userID); err != nil {
 		return maybes, errors.Wrapf(err, "selecting maybes by tag %q", tagID)
-	}
-
-	return maybes, nil
-}
-
-// QuerybyTitle retrieves an entry by quering the title from the database.
-func (r RepositoryDb) QueryByTitle(title string, userID string) (Infos, error) {
-	const q = `
-	SELECT
-		m.*,
-		u.user_id AS user_id
-	FROM maybes as m
-	LEFT JOIN
-		users AS u ON m.user_id = u.user_id
-	WHERE
-		m.title LIKE '%' || $1 || '%'
-		AND
-		u.user_id = $2
-	`
-	var maybes Infos
-	if err := r.Db.Select(&maybes, q, title, userID); err != nil {
-		if err == sql.ErrNoRows {
-			return maybes, ErrNotFound
-		}
-		return maybes, errors.Wrap(err, "selecting maybes by title")
 	}
 
 	return maybes, nil
