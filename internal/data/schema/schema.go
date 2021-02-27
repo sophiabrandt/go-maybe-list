@@ -36,40 +36,37 @@ CREATE TABLE users (
 	active        BOOLEAN NOT NULL DEFAULT TRUE,
 	created_at    TIMESTAMP NOT NULL,
 	updated_at    TIMESTAMP NOT NULL,
-PRIMARY KEY (user_id)
+PRIMARY KEY(user_id)
 );
 -- Create maybes
 CREATE TABLE maybes (
 	maybe_id       UUID NOT NULL,
-	user_id        UUID,
+	user_id        UUID NOT NULL,
 	title          TEXT NOT NULL,
 	url            TEXT NOT NULL,
 	description    TEXT NOT NULL,
 	created_at     TIMESTAMP NOT NULL,
 	updated_at     TIMESTAMP NOT NULL,
-PRIMARY KEY (maybe_id),
+PRIMARY KEY(maybe_id),
 -- One-to-many relationship between users and maybes
-FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE
+FOREIGN KEY(user_id) REFERENCES users(user_id) ON DELETE CASCADE
 );
--- Create index on maybe titles
-CREATE INDEX idx_maybe_title ON maybes(title);
 -- Create tags
 CREATE TABLE tags (
 	tag_id         UUID NOT NULL,
-	name           TEXT NOT NULL
+	name           TEXT NOT NULL UNIQUE,
+PRIMARY KEY(tag_id)
 );
--- Create index on tag names
-CREATE UNIQUE INDEX idx_tag_names ON tags(name);
 -- Linking table for many-to-many relationship between Tag and Maybe
 CREATE TABLE maybetags (
-	maybe_id       UUID,
-	user_id		   UUID,
-	tag_id         UUID,
-FOREIGN KEY(maybe_id) REFERENCES maybe(maybe_id),
-FOREIGN KEY(user_id) REFERENCES users(user_id),
-FOREIGN KEY(tag_id) REFERENCES tags(tag_id),
-UNIQUE(maybe_id, tag_id)
-)
+	tag_id         UUID NOT NULL,
+	maybe_id       UUID NOT NULL,
+	user_id		   UUID NOT NULL,
+FOREIGN KEY(tag_id) REFERENCES tags(tag_id) ON DELETE CASCADE,
+FOREIGN KEY(maybe_id) REFERENCES maybes(maybe_id) ON DELETE CASCADE,
+FOREIGN KEY(user_id) REFERENCES users(user_id) ON DELETE CASCADE,
+UNIQUE(tag_id, maybe_id)
+);
 `,
 	},
 }

@@ -15,6 +15,18 @@ func New(dbName string) (*sqlx.DB, error) {
 	if err = db.Ping(); err != nil {
 		return nil, errors.Wrap(err, "Unable to ping database")
 	}
+
+	const q = `
+	PRAGMA foreign_keys = ON;
+	PRAGMA synchronous = NORMAL;
+	PRAGMA journal_mode = 'WAL';
+	PRAGMA cache_size = -64000;
+	`
+	_, err = db.Exec(q)
+	if err != nil {
+		return nil, errors.Wrap(err, "Unable to set pragmas")
+	}
+
 	return db, nil
 }
 
