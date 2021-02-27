@@ -239,7 +239,7 @@ func (mg maybeGroup) deleteMaybe(e *env.Env, w http.ResponseWriter, r *http.Requ
 
 	e.Session.Put(r, "flash", "Maybe successfully deleted!")
 
-	http.Redirect(w, r, "/maybes", http.StatusSeeOther)
+	http.Redirect(w, r, "/", http.StatusSeeOther)
 	return nil
 }
 

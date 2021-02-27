@@ -54,7 +54,7 @@ func (ug userGroup) signup(e *env.Env, w http.ResponseWriter, r *http.Request) e
 	}
 
 	e.Session.Put(r, "flash", "Signup successful. Please log in.")
-	http.Redirect(w, r, "/maybes", http.StatusSeeOther)
+	http.Redirect(w, r, "/users/login", http.StatusSeeOther)
 	return nil
 }
 
@@ -90,7 +90,7 @@ func (ug userGroup) login(e *env.Env, w http.ResponseWriter, r *http.Request) er
 		return nil
 	}
 
-	http.Redirect(w, r, "/maybes", http.StatusSeeOther)
+	http.Redirect(w, r, "/", http.StatusSeeOther)
 	return nil
 }
 
