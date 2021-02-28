@@ -39,6 +39,9 @@
       <ul>
         <li><a href="#built-with">Built With</a></li>
       </ul>
+      <ul>
+        <li><a href="#screenshots">Screenshots</a></li>
+      </ul>
     </li>
     <li>
       <a href="#getting-started">Getting Started</a>
@@ -62,23 +65,49 @@
 
 **go-maybe-list** is a full-stack web application written in Go. It's written from scratch, without any pre-build web framework like Gin or Echo.
 
-You can save links and ideas as "maybes" for later.
+You can save links and ideas as "maybes" for later. Each maybe can have one or more tags.  
+You can either view all entries or only entries belonging to a tag.  
+If you update a maybe, tags will be dynamically added, updated or deleted.
 
 ### Features
 
 - custom web service framework/handler to isolate dependencies and improve error handling
 - middleware integration
 - SQL database support using SQLite (easy to swap out to a different SQL database)
-- Account signup
-- Use of Docker, Docker Compose, Makefiles
-- Vendoring dependencies with Modules, requires Go 1.12 or higher
+- _no_ ORM, use of Go's standard `database/sql` library and [`jmoiron/sqlx`](https://github.com/jmoiron/sqlx)
+- user authentication and authorization with sessions
+- profile view and change password
+- form validation
+- use of Docker, Docker Compose, Makefiles
+- vendoring dependencies with Modules, requires Go 1.12 or higher
 - Admin CLI with boilerplate templates to reduce repetitive copy/pasting.
-- Minimal, responsive HTML and CSS with dark and light theme (via [`prefers-color-scheme`](https://developer.mozilla.org/en-US/docs/Web/CSS/@media/prefers-color-scheme))
+- responsive HTML and CSS _without_ media queries
+- dark and light theme (via [`prefers-color-scheme`](https://developer.mozilla.org/en-US/docs/Web/CSS/@media/prefers-color-scheme)) 
 
 ### Built With
 
 - [Go](https://golang.org/)
 - [SQLite](https://www.sqlite.org)
+
+### Screenshots
+
+* Home Page
+![Home Page](screenshots/gomaybelist.app.localhost_.png)
+
+* Signup/Register
+![Register](screenshots/gomaybelist.app.localhost_users_signup.png)
+
+* Login (with flash message from previous successful signup)
+![Login](screenshots/gomaybelist.app.localhost_users_login.png)
+
+* Create a new entry
+![Create](screenshots/gomaybelist.app.localhost_maybes_new.png)
+
+* Validation errors
+![Validation](screenshots/gomaybelist.app.localhost_maybes_new_validation.png)
+
+* Dark mode
+![Dark mode](screenshots/gomaybelist.app.localhost_maybes_1a271027-38c7-4d85-a5c1-b83eb903d90b.png)
 
 <!-- GETTING STARTED -->
 

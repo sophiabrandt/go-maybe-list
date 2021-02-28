@@ -198,6 +198,7 @@ input[type="email"],
 input[type="password"],
 textarea {
   background-color: var(--color-background);
+  color: var(--color-dark);
 }
 input[type="submit"] {
   color: var(--color-neutral);
