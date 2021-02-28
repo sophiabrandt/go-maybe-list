@@ -1,6 +1,6 @@
 # Build environment
 # -----------------
-FROM golang:1.15-alpine as build-env
+FROM golang:1.15-alpine as compile-image
 
 WORKDIR /app
 
@@ -16,7 +16,7 @@ RUN CGO_ENABLED=0 GOOS=linux go build -ldflags '-w -s' -a -o ./bin/admin ./cmd/a
 
 # Deployment environment
 # ----------------------
-FROM alpine:3.12
+FROM alpine:3.12 as runtime-image
 
 WORKDIR /app
 

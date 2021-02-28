@@ -20,13 +20,30 @@ build:
   environment:
     name: production
   script:
+    - cd docker/app
+    - docker pull $CI_REGISTRY_IMAGE:compile-stage || true
     - docker pull $CI_REGISTRY_IMAGE:latest || true
     - >
       docker build
       --pull
+      --target compile-image
+      --cache-from $CI_REGISTRY_IMAGE:compile-stage
+      --tag $CI_REGISTRY_IMAGE:compile-stage
+      --file ./Dockerfile
+      .
+    - >
+      docker build
+      --pull
+      --target runtime-image
+      --cache-from $CI_REGISTRY_IMAGE:compile-stage
       --cache-from $CI_REGISTRY_IMAGE:latest
       --tag $CI_REGISTRY_IMAGE:$CI_COMMIT_SHA
+      --tag $CI_REGISTRY_IMAGE:latest
+      --file ./Dockerfile
+      .
+    - docker push $CI_REGISTRY_IMAGE:compile-stage
     - docker push $CI_REGISTRY_IMAGE:$CI_COMMIT_SHA
+    - docker push $CI_REGISTRY_IMAGE:latest
 
 push:
   stage: push
