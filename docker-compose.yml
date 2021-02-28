@@ -1,4 +1,25 @@
-version: '3.8'
+version: '2.4'
 
 services:
   gomaybelist:
+    build:
+      context: .
+      dockerfile: ./docker/app/Dockerfile.dev
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.gomaybelist.entrypoints=websecure
+      - traefik.http.routers.gomaybelist.rule=Host(`gomaybelist.app.localhost`)
+      - traefik.http.routers.gomaybelist.tls=true
+      - traefik.http.routers.gomaybelist.tls.options=default
+      - traefik.http.routers.gomaybelist.tls.domains[0].main=gomaybelist.app.localhost
+      - traefik.http.services.gomaybelist.loadbalancer.server.port=4000
+    ports:
+      - 4000:4000
+    volumes:
+      - .:/app
+    networks:
+      - traefik-network
+
+networks:
+  traefik-network:
+    external: true
