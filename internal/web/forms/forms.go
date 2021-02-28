@@ -101,6 +101,8 @@ func (f *Form) IsEqualString(field1 string, field2 string) {
 	}
 }
 
+var EmailRegex = regexp.MustCompile("^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$")
+
 // http://www.inanzzz.com/index.php/post/8l1a/validating-user-password-in-golang-requests
 // SecurePassword defines a set of requirements for a password.
 func (f *Form) SecurePassword(field string) {

@@ -28,6 +28,7 @@ func (ug userGroup) signup(e *env.Env, w http.ResponseWriter, r *http.Request) e
 	// form validation
 	form := forms.New(r.PostForm)
 	form.Required("name", "email", "password")
+	form.MatchesPattern("email", forms.EmailRegex)
 	form.MaxLength("name", 255)
 	form.SecurePassword("password")
 	form.IsEqualString("password", "confirm password")
