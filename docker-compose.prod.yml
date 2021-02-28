@@ -1,7 +1,7 @@
 version: '3.8'
 
 services:
-  app:
+  gomaybelist:
     image: registry.gitlab.com/repository.host/go-maybe-list
     deploy:
       labels:

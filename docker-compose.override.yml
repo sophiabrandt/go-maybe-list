@@ -1,5 +1,5 @@
 services:
-  app:
+  gomaybelist:
     build:
       context: .
       dockerfile: ./docker/app/Dockerfile.dev
