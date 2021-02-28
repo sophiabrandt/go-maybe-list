@@ -29,8 +29,8 @@ USER user
 COPY --chown=user:user ./ui ./ui
 
 # Binaries
-COPY --from=build-env --chown=user:user /app/bin/web .
-COPY --from=build-env --chown=user:user /app/bin/admin .
+COPY --from=compile-image --chown=user:user /app/bin/web .
+COPY --from=compile-image --chown=user:user /app/bin/admin .
 
 EXPOSE 4000
 
