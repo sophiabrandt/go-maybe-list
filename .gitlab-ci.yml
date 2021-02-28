@@ -1,3 +1,37 @@
+image: docker:19.03.12
+
+stages:
+  - build
+  - push
+  - deploy
+
+build:
+  stage: build
+  variables:
+    DOCKER_DRIVER: overlay2
+  services:
+    - docker:19.03.12-dind
+  rules:
+    - if: $CI_COMMIT_BRANCH == 'main'
+  environment:
+    name: production
+  before_script:
+    - echo -n $CI_JOB_TOKEN | docker login -u gitlab-ci-token --password-stdin $CI_REGISTRY
+  script:
+    - >
+    docker build
+      --pull
+      --cache-from $CI_REGISTRY_IMAGE:latest
+      --tag $CI_REGISTRY_IMAGE:$CI_COMMIT_SHA
+    - docker push $CI_REGISTRY_IMAGE:$CI_COMMIT_SHA
+
+push:
+  stage: push
+  script:
+    - docker pull $CI_REGISTRY_IMAGE:$CI_COMMIT_SHA
+    - docker tag $CI_REGISTRY_IMAGE:$CI_COMMIT_SHA $CI_REGISTRY_IMAGE:latest
+    - docker push $CI_REGISTRY_IMAGE:latest
+
 deploy:
   stage: deploy
   image: docker:19.03.12

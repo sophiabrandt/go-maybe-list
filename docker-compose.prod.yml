@@ -2,6 +2,7 @@ version: '3.8'
 
 services:
   app:
+    image: registry.gitlab.com/repository.host/go-maybe-list
     deploy:
       labels:
         - traefik.enable=true

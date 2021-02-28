@@ -11,8 +11,8 @@ RUN go mod download
 
 COPY . .
 
-RUN go build -ldflags '-w -s' -a -o ./bin/web ./cmd/web
-RUN go build -ldflags '-w -s' -a -o ./bin/admin ./cmd/admin
+RUN CGO_ENABLED=0 GOOS=linux go build -ldflags '-w -s' -a -o ./bin/web ./cmd/web
+RUN CGO_ENABLED=0 GOOS=linux go build -ldflags '-w -s' -a -o ./bin/admin ./cmd/admin
 
 # Deployment environment
 # ----------------------
