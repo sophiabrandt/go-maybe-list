@@ -19,7 +19,7 @@
     <a href="https://github.com/sophiabrandt/go-maybe-list"><strong>Explore the docs »</strong></a>
     <br />
     <br />
-    <a href="https://github.com/sophiabrandt/go-maybe-list">View Demo</a>
+    <a href="https://gomaybelist.repository.host/">View Demo</a>
     ·
     <a href="https://github.com/sophiabrandt/go-maybe-list/issues">Report Bug</a>
     ·
@@ -68,6 +68,10 @@
 You can save links and ideas as "maybes" for later. Each maybe can have one or more tags.  
 You can either view all entries or only entries belonging to a tag.  
 If you update a maybe, tags will be dynamically added, updated or deleted.
+
+I've deployed a **[demo][demo]** (via GitOps/Gitlab CI) to a $5 [Upcloud VPS](https://upcloud.com/).
+
+Use `testuser@testuser.com` with password `123456Ma$` or sign up with a new account.
 
 ### Features
 
@@ -203,3 +207,4 @@ Project Link: [https://github.com/sophiabrandt/go-maybe-list](https://github.com
 [issues-url]: https://github.com/sophiabrandt/go-maybe-list/issues
 [license-shield]: https://img.shields.io/github/license/sophiabrandt/go-maybe-list.svg?style=for-the-badge
 [license-url]: https://github.com/sophiabrandt/go-maybe-list/blob/master/LICENSE
+[demo]: https://gomaybelist.repository.host/
