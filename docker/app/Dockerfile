@@ -4,7 +4,7 @@ FROM golang:1.15-alpine as compile-image
 
 WORKDIR /app
 
-RUN apk update && apk add --no-cache sqlite gcc musl-dev git
+RUN apk update && apk add --no-cache git
 
 COPY go.mod go.sum ./
 RUN go mod download
@@ -20,7 +20,7 @@ FROM alpine:3.12 as runtime-image
 
 WORKDIR /app
 
-RUN apk update && apk add --no-cache bash
+RUN apk update && apk add --no-cache bash sqlite
 
 RUN adduser -D user && chown -R user:user /app
 USER user
