@@ -11,6 +11,8 @@ services:
       - traefik.http.routers.gomaybelist.tls.options=default
       - traefik.http.routers.gomaybelist.tls.domains[0].main=gomaybelist.app.localhost
       - traefik.http.services.gomaybelist.loadbalancer.server.port=4000
+    ports:
+      - 4000:4000
     volumes:
       - .:/app
     networks:
