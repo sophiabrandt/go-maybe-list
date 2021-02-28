@@ -1,23 +1,28 @@
 image: docker:19.03.12
+only:
+  - main
 
 stages:
   - build
   - push
   - deploy
 
+before_script:
+  - echo -n $CI_JOB_TOKEN | docker login -u gitlab-ci-token --password-stdin $CI_REGISTRY
+
+services:
+  - docker:19.03.12-dind
+
 build:
   stage: build
   variables:
     DOCKER_DRIVER: overlay2
-  services:
-    - docker:19.03.12-dind
   rules:
     - if: $CI_COMMIT_BRANCH == 'main'
   environment:
     name: production
-  before_script:
-    - echo -n $CI_JOB_TOKEN | docker login -u gitlab-ci-token --password-stdin $CI_REGISTRY
   script:
+    - docker pull $CI_REGISTRY_IMAGE:latest || true
     - >
       docker build
       --pull
@@ -44,7 +49,6 @@ deploy:
   environment:
     name: production
   before_script:
-    - echo -n $CI_JOB_TOKEN | docker login -u gitlab-ci-token --password-stdin $CI_REGISTRY
     - 'which ssh-agent || (apt-get update -y && apt-get install openssh-client -y)'
     - eval $(ssh-agent -s)
     - cat "$SSH_PRIVATE_KEY" | tr -d '\r' | ssh-add -
