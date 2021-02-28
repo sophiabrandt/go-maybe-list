@@ -1,0 +1,21 @@
+version: '3.8'
+
+services:
+  app:
+    deploy:
+      labels:
+        - traefik.enable=true
+        - traefik.constraint-label=cloud-public
+        - traefik.http.routers.gomaybelist.entrypoints=websecure
+        - traefik.http.routers.gomaybelist.rule=Host(`${DOMAIN}`)
+        - traefik.http.routers.gomaybelist.tls=true
+        - traefik.http.routers.gomaybelist.tls.options=tls12@file
+        - traefik.http.routers.gomaybelist.tls.certresolver=letsencrypt
+        - traefik.http.routers.gomaybelist.middlewares=traefik-ratelimit,traefik-inflightreq
+        - traefik.http.services.gomaybelist.loadbalancer.server.port=4000
+    networks:
+      - cloud-public
+
+networks:
+  cloud-public:
+    external: true

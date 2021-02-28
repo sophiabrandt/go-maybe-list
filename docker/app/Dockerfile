@@ -6,6 +6,9 @@ WORKDIR /app
 
 RUN apk update && apk add --no-cache sqlite gcc musl-dev git
 
+COPY go.mod go.sum ./
+RUN go mod download
+
 COPY . .
 
 RUN go build -ldflags '-w -s' -a -o ./bin/web ./cmd/web
@@ -31,4 +34,4 @@ COPY --from=build-env --chown=user:user /app/bin/admin .
 
 EXPOSE 4000
 
-CMD [ "./web"]
+CMD [ "./web", "-secret=$COOKIE_SECRET" ]
