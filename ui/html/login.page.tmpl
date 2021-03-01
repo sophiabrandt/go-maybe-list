@@ -12,15 +12,19 @@
     {{end}}
     <input type="hidden" name="csrf_token" value="" />
     <div>
-      <label for="email">Email:</label>
+      <label>Email:
       <input type="email" name="email" value="{{.Get "email"}}" />
+      </label>
     </div>
     <div>
-      <label for="password">Password:</label>
+      <label>Password:
       <input type="password" name="password" />
+      </label>
     </div>
     <div>
+      <label>Login
       <input type="submit" value="login" />
+      </label>
     </div>
     {{end}}
   </form>

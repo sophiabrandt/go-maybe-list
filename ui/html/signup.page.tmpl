@@ -8,33 +8,39 @@
     <input type="hidden" name="csrf_token" value="{{.CSRFToken}}">
     {{with .Form}}
     <div>
-      <label for="name">Name:</label>
+      <label>Name:
       {{with .Errors.Get "name"}}
       <label class="error">{{.}}</label>
       {{end}} <input type="text" name="name" value="{{.Get "name"}}" />
+      </label>
     </div>
     <div>
-      <label for="email">Email:</label>
+      <label>Email:
       {{with .Errors.Get "email"}}
       <label class="error">{{.}}</label>
       {{end}} <input type="email" name="email" value="{{.Get "email"}}" />
+      </label>
     </div>
     <div>
-      <label for="password">Password:</label>
+      <label>Password:
       {{with .Errors.Get "password"}}
       <label class="error">{{.}}</label>
       {{end}}
       <input type="password" name="password" />
+      </label>
     </div>
     <div>
-      <label for="confirm password">Confirm Password:</label>
+      <label>Confirm Password:
       {{with .Errors.Get "confirm password"}}
       <label class="error">{{.}}</label>
       {{end}}
       <input type="password" name="confirm password" />
+      </label>
     </div>
     <div>
+      <label>Signup
       <input type="submit" value="signup" />
+      </label>
     </div>
     {{end}}
   </form>
