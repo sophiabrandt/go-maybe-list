@@ -77,4 +77,4 @@ deploy:
   script:
     - DOCKER_HOST="ssh://$SERVER_USER@$SERVER_HOSTNAME:$SSH_PORT" docker stack deploy --with-registry-auth -c docker-compose.prod.yml $SWARM_NAME
     - sleep 60
-    - DOCKER_HOST="ssh://$SERVER_USER@$SERVER_HOSTNAME:$SSH_PORT" docker exec -it $(docker ps -q -f name=traefik_gomaybelist) ./admin -action='migrate'"
+    - DOCKER_HOST="ssh://$SERVER_USER@$SERVER_HOSTNAME:$SSH_PORT" docker exec -it $(docker ps -q -f name=traefik_gomaybelist) ./admin -action="migrate"
