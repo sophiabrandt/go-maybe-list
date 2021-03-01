@@ -25,7 +25,7 @@ RUN apk update && apk add --no-cache bash sqlite
 RUN adduser -D user && chown -R user:user /app
 USER user
 
-# Static Files & database
+# Static Files
 COPY --chown=user:user ./ui ./ui
 
 # Binaries
@@ -33,5 +33,7 @@ COPY --from=compile-image --chown=user:user /app/bin/web .
 COPY --from=compile-image --chown=user:user /app/bin/admin .
 
 EXPOSE 4000
+
+RUN ./admin -action="migrate"
 
 CMD [ "./web", "-secret=$COOKIE_SECRET" ]
