@@ -65,11 +65,11 @@
 
 **go-maybe-list** is a full-stack web application written in Go. It's written from scratch, without any pre-build web framework like Gin or Echo.
 
-You can save links and ideas as "maybes" for later. Each maybe can have one or more tags.  
+You can save links and ideas as "maybes" for later. Each maybe can have none or one to many tags.   
 You can either view all entries or only entries belonging to a tag.  
 If you update a maybe, tags will be dynamically added, updated or deleted.
 
-I've deployed a **[demo][demo]** (via GitOps/Gitlab CI) to a $5 [Upcloud VPS](https://upcloud.com/).
+I've deployed a **[demo][demo]** (via GitOps/Gitlab CI) to a $5 [Upcloud VPS](https://upcloud.com/) ([How?](https://www.rockyourcode.com/traefik-2-docker-swarm-setup-with-docker-socket-proxy-and-more/)).
 
 Use `testuser@testuser.com` with password `123456Ma$` or sign up with a new account.
 

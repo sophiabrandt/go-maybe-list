@@ -25,7 +25,6 @@ build:
     - docker pull $CI_REGISTRY_IMAGE:latest || true
     - >
       docker build
-      --pull
       --target compile-image
       --cache-from $CI_REGISTRY_IMAGE:compile-stage
       --tag $CI_REGISTRY_IMAGE:compile-stage
@@ -33,7 +32,6 @@ build:
       .
     - >
       docker build
-      --pull
       --target runtime-image
       --cache-from $CI_REGISTRY_IMAGE:compile-stage
       --cache-from $CI_REGISTRY_IMAGE:latest
@@ -43,10 +41,11 @@ build:
       .
     - docker push $CI_REGISTRY_IMAGE:compile-stage
     - docker push $CI_REGISTRY_IMAGE:$CI_COMMIT_SHA
-    - docker push $CI_REGISTRY_IMAGE:latest
 
 push:
   stage: push
+  variables:
+    GIT_STRATEGY: none
   only:
     - main
   script:
