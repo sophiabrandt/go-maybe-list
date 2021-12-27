@@ -71,7 +71,7 @@ If you update a maybe, tags will be dynamically added, updated or deleted.
 
 I've deployed a **[demo][demo]** (via GitOps/Gitlab CI) to a $5 [Upcloud VPS](https://upcloud.com/) ([How?](https://www.rockyourcode.com/traefik-2-docker-swarm-setup-with-docker-socket-proxy-and-more/)).
 
-Use `testuser@testuser.com` with password `123456Ma$` or sign up with a new account.
+Sign up with a new account to test-drive the application (you can use a temporary email provider if you like).
 
 ### Features
 

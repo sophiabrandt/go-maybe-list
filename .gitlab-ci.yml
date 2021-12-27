@@ -1,4 +1,4 @@
-image: docker:19.03.12
+image: docker:20.10.11
 
 stages:
   - build
@@ -10,7 +10,7 @@ default:
     - echo -n $CI_JOB_TOKEN | docker login -u gitlab-ci-token --password-stdin $CI_REGISTRY
 
 services:
-  - docker:19.03.12-dind
+  - docker:20.10.11-dind
 
 build:
   stage: build
@@ -55,11 +55,11 @@ push:
 
 deploy:
   stage: deploy
-  image: docker:19.03.12
+  image: docker:20.10.11
   variables:
     DOCKER_DRIVER: overlay2
   services:
-    - docker:19.03.12-dind
+    - docker:20.10.11-dind
   rules:
     - if: $CI_COMMIT_BRANCH == 'main'
   environment:
