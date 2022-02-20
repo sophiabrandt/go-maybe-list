@@ -31,12 +31,12 @@ var (
 	ErrForbidden = errors.New("attempted action is not allowed")
 )
 
-// RepositoryDb defines the repository for the book service.
+// RepositoryDb defines the repository for the user service.
 type RepositoryDb struct {
 	Db *sqlx.DB
 }
 
-// New returns a pointer to a book repo.
+// New returns a pointer to a user repo.
 func New(db *sqlx.DB) RepositoryDb {
 	return RepositoryDb{Db: db}
 }
