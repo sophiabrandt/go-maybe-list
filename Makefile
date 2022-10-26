@@ -8,7 +8,7 @@ export PROJECT = go-maybe-list
 run: up dev
 
 up:
-	docker-compose up -d
+	docker compose up -d
 
 dev:
 	go run ./cmd/web
