@@ -39,16 +39,15 @@ main:focus {
   outline: none;
 }
 
-html,
-body {
-  min-height: 100vh;
-  min-height: 100dvh;
-}
-
 body {
   background-color: var(--color-background);
-  display: flex;
-  flex-direction: column;
+}
+
+.main-layout {
+  min-height: 100vh;
+  min-height: 100dvh;
+  display: grid;
+  grid-template-rows: auto auto 1fr auto;
 }
 
 a {

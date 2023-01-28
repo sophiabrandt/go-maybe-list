@@ -12,38 +12,40 @@
         <title>{{template "title" .}} - Maybe List</title>
     </head>
     <body>
-      <header class="center header__content">
-        <h1 class="mt"><a href="/">Maybe List</a></h1>
-        <img class="center"src="/static/img/question.svg" alt="question" width="50rem" height="50rem">
-      </header>
-      <nav class="wrapper cluster nav__content">
-        <div>
-          <a href="/">Home</a>
-          {{if .IsAuthenticated}}
-          <a href="/maybes/new">New</a>
-          <a href="/tags">Tags</a>
-          {{end}}
-        </div>
-        <div class="cluster">
+      <div class="main-layout">
+        <header class="center header__content">
+          <h1 class="mt"><a href="/">Maybe List</a></h1>
+          <img class="center"src="/static/img/question.svg" alt="question" width="50rem" height="50rem">
+        </header>
+        <nav class="wrapper cluster nav__content">
+          <div>
+            <a href="/">Home</a>
             {{if .IsAuthenticated}}
-            <a href="/users/profile/">Profile</a>
-            <form action="/users/logout" method="POST">
-                <input type="hidden" name="csrf_token" value="{{.CSRFToken}}">
-                <button>Logout</button>
-            </form>
-          {{else}}
-          <a href="/users/signup">Signup</a>
-          <a href="/users/login">Login</a>
+            <a href="/maybes/new">New</a>
+            <a href="/tags">Tags</a>
+            {{end}}
+          </div>
+          <div class="cluster">
+              {{if .IsAuthenticated}}
+              <a href="/users/profile/">Profile</a>
+              <form action="/users/logout" method="POST">
+                  <input type="hidden" name="csrf_token" value="{{.CSRFToken}}">
+                  <button>Logout</button>
+              </form>
+            {{else}}
+            <a href="/users/signup">Signup</a>
+            <a href="/users/login">Login</a>
+            {{end}}
+          </div>
+        </nav>
+        <main class="wrapper__medium stack main__content">
+          {{with .Flash}}
+            <div class="flash">{{.}}</div>
           {{end}}
-        </div>
-      </nav>
-      <main class="wrapper__medium stack main__content">
-        {{with .Flash}}
-          <div class="flash">{{.}}</div>
-        {{end}}
-        {{template "main" .}}
-      </main>
-    </body>
-    {{template "footer" .}}
+          {{template "main" .}}
+        </main>
+      </body>
+      {{template "footer" .}}
+    </div>
 </html>
 {{end}}
