@@ -9,6 +9,7 @@
   --measure: 60ch;
   --color-background: #fdfffc;
   --color-dark: #290149;
+  --color-accent: #7f3a50;
   --color-light: #f1faee;
   --color-neutral: #6c757d;
   --color-tertiary: #ff75a0;
@@ -39,13 +40,13 @@ main:focus {
   outline: none;
 }
 
-body {
+html, body {
+  height: 100%;
   background-color: var(--color-background);
 }
 
 .main-layout {
-  min-height: 100vh;
-  min-height: 100dvh;
+  min-height: 100%;
   display: grid;
   grid-template-rows: auto auto 1fr auto;
 }
@@ -278,6 +279,14 @@ footer > * {
 
 footer:last-child {
   padding-bottom: 0.5rem;
+}
+
+footer a {
+  color: var(--color-accent);
+}
+
+footer a:hover {
+  color: #0a131f;
 }
 
 .mt {
