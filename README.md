@@ -65,7 +65,7 @@
 
 **go-maybe-list** is a full-stack web application written in Go. It's written from scratch, without any pre-build web framework like Gin or Echo.
 
-You can save links and ideas as "maybes" for later. Each maybe can have none or one to many tags.   
+You can save links and ideas as "maybes" for later. Each maybe can have none or one to many tags.  
 You can either view all entries or only entries belonging to a tag.  
 If you update a maybe, tags will be dynamically added, updated or deleted.
 
@@ -86,7 +86,7 @@ Sign up with a new account to test-drive the application (you can use a temporar
 - vendoring dependencies with Modules, requires Go 1.12 or higher
 - Admin CLI with boilerplate templates to reduce repetitive copy/pasting.
 - responsive HTML and CSS _without_ media queries
-- dark and light theme (via [`prefers-color-scheme`](https://developer.mozilla.org/en-US/docs/Web/CSS/@media/prefers-color-scheme)) 
+- dark and light theme (via [`prefers-color-scheme`](https://developer.mozilla.org/en-US/docs/Web/CSS/@media/prefers-color-scheme))
 
 ### Built With
 
@@ -95,23 +95,23 @@ Sign up with a new account to test-drive the application (you can use a temporar
 
 ### Screenshots
 
-* Home Page
-![Home Page](screenshots/gomaybelist.app.localhost_.png)
+- Home Page
+  ![Home Page](screenshots/gomaybelist.app.localhost_.png)
 
-* Signup/Register
-![Register](screenshots/gomaybelist.app.localhost_users_signup.png)
+- Signup/Register
+  ![Register](screenshots/gomaybelist.app.localhost_users_signup.png)
 
-* Login (with flash message from previous successful signup)
-![Login](screenshots/gomaybelist.app.localhost_users_login.png)
+- Login (with flash message from previous successful signup)
+  ![Login](screenshots/gomaybelist.app.localhost_users_login.png)
 
-* Create a new entry
-![Create](screenshots/gomaybelist.app.localhost_maybes_new.png)
+- Create a new entry
+  ![Create](screenshots/gomaybelist.app.localhost_maybes_new.png)
 
-* Validation errors
-![Validation](screenshots/gomaybelist.app.localhost_maybes_new_validation.png)
+- Validation errors
+  ![Validation](screenshots/gomaybelist.app.localhost_maybes_new_validation.png)
 
-* Dark mode
-![Dark mode](screenshots/gomaybelist.app.localhost_maybes_1a271027-38c7-4d85-a5c1-b83eb903d90b.png)
+- Dark mode
+  ![Dark mode](screenshots/gomaybelist.app.localhost_maybes_1a271027-38c7-4d85-a5c1-b83eb903d90b.png)
 
 <!-- GETTING STARTED -->
 
@@ -194,7 +194,7 @@ Project Link: [https://github.com/sophiabrandt/go-maybe-list](https://github.com
 - [http.Handler and Error Handling in Go](https://blog.questionable.services/article/http-handler-error-handling-revisited/)
 - [Develop A Production Ready REST API in Go](https://tutorialedge.net/courses/go-rest-api-course/)
 - [https://github.com/ardanlabs/service](https://github.com/ardanlabs/service)
-- [Graceful shutdown of Golang servers using Context and OS signals](https://archive.is/Mf0dJ)
+- [Graceful shutdown of Golang servers using Context and OS signals](https://archive.ph/Mf0dJ)
 - [Learning Cloud Native Go](https://learning-cloud-native-go.github.io/)
 - [Every Layout](https://every-layout.dev)
 
