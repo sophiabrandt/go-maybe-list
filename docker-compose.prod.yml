@@ -12,7 +12,7 @@ services:
         - traefik.http.routers.gomaybelist.tls=true
         - traefik.http.routers.gomaybelist.tls.options=default
         - traefik.http.routers.gomaybelist.tls.certresolver=letsencrypt
-        - traefik.http.routers.gomaybelist.middlewares=traefik-ratelimit,traefik-inflightreq
+        - traefik.http.routers.gomaybelist.middlewares=traefik-ratelimit,traefik-inflightreq,secureHeaders@file
         - traefik.http.services.gomaybelist.loadbalancer.server.port=4000
     networks:
       - cloud-public
