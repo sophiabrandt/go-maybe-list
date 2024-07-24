@@ -10,7 +10,7 @@ import (
 // defined in this package.
 func Migrate(db *sqlx.DB) error {
 	driver := darwin.NewGenericDriver(db.DB, darwin.SqliteDialect{})
-	d := darwin.New(driver, migrations, nil)
+	d := darwin.New(driver, migrations)
 	return d.Migrate()
 }
 
@@ -24,7 +24,7 @@ func Migrate(db *sqlx.DB) error {
 // consider a combined approach using a tool like packr or go-bindata.
 var migrations = []darwin.Migration{
 	{
-		Version:     1.1,
+		Version:     1,
 		Description: "Create table users, maybes, tag",
 		Script: `
 -- Create users
