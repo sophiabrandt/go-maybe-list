@@ -1,6 +1,6 @@
 module github.com/sophiabrandt/go-maybe-list
 
-go 1.17
+go 1.22
 
 require (
 	github.com/dimfeld/httptreemux/v5 v5.5.0
