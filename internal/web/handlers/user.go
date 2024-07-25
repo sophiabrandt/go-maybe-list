@@ -105,7 +105,7 @@ func (ug userGroup) profile(e *env.Env, w http.ResponseWriter, r *http.Request) 
 		case user.ErrNotFound:
 			return web.StatusError{Err: err, Code: http.StatusNotFound}
 		default:
-			return errors.Wrapf(err, "ID : %s", params["id"])
+			return errors.Wrapf(err, "ID : %s", params.ByName("id"))
 		}
 	}
 

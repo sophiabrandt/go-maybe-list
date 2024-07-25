@@ -3,12 +3,12 @@ module github.com/sophiabrandt/go-maybe-list
 go 1.22
 
 require (
-	github.com/dimfeld/httptreemux/v5 v5.5.0
 	github.com/dimiro1/darwin v0.0.0-20240202224157-e03bebccbcd4
 	github.com/go-resty/resty/v2 v2.13.1
 	github.com/golangcollege/sessions v1.2.0
 	github.com/google/uuid v1.6.0
 	github.com/jmoiron/sqlx v1.4.0
+	github.com/julienschmidt/httprouter v1.3.0
 	github.com/justinas/alice v1.2.0
 	github.com/justinas/nosurf v1.1.1
 	github.com/pkg/errors v0.9.1

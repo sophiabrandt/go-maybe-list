@@ -3,8 +3,8 @@ package handlers
 import (
 	"net/http"
 
-	"github.com/dimfeld/httptreemux/v5"
 	"github.com/jmoiron/sqlx"
+	"github.com/julienschmidt/httprouter"
 	"github.com/justinas/alice"
 	"github.com/sophiabrandt/go-maybe-list/internal/data/maybe"
 	"github.com/sophiabrandt/go-maybe-list/internal/data/user"
@@ -19,7 +19,7 @@ func New(e *env.Env, db *sqlx.DB) http.Handler {
 
 	dynamicMiddleware := alice.New(e.Session.Enable, mid.NoSurf, mid.Authenticate(e, user.New(db)))
 
-	r := httptreemux.NewContextMux()
+	r := httprouter.New()
 
 	// liveness check
 	dg := debugGroup{
@@ -34,12 +34,12 @@ func New(e *env.Env, db *sqlx.DB) http.Handler {
 	r.Handler(http.MethodGet, "/", dynamicMiddleware.Then(web.Handler{e, mg.getAllMaybes}))
 	r.Handler(http.MethodGet, "/maybes/new", dynamicMiddleware.Append(mid.RequireAuthentication(e)).Then(web.Handler{e, mg.createMaybeForm}))
 	r.Handler(http.MethodPost, "/maybes/new", dynamicMiddleware.Append(mid.RequireAuthentication(e)).Then(web.Handler{e, mg.createMaybe}))
-	r.Handler(http.MethodGet, "/maybes/:id", dynamicMiddleware.Append(mid.RequireAuthentication(e)).Then(web.Handler{e, mg.getMaybeByID}))
-	r.Handler(http.MethodPost, "/maybes/:id/delete", dynamicMiddleware.Append(mid.RequireAuthentication(e)).Then(web.Handler{e, mg.deleteMaybe}))
-	r.Handler(http.MethodGet, "/maybes/:id/update", dynamicMiddleware.Append(mid.RequireAuthentication(e)).Then(web.Handler{e, mg.updateMaybeForm}))
-	r.Handler(http.MethodPost, "/maybes/:id/update", dynamicMiddleware.Append(mid.RequireAuthentication(e)).Then(web.Handler{e, mg.updateMaybe}))
+	r.Handler(http.MethodGet, "/maybes/maybe/:id", dynamicMiddleware.Append(mid.RequireAuthentication(e)).Then(web.Handler{e, mg.getMaybeByID}))
+	r.Handler(http.MethodPost, "/maybes/maybe/:id/delete", dynamicMiddleware.Append(mid.RequireAuthentication(e)).Then(web.Handler{e, mg.deleteMaybe}))
+	r.Handler(http.MethodGet, "/maybes/maybe/:id/update", dynamicMiddleware.Append(mid.RequireAuthentication(e)).Then(web.Handler{e, mg.updateMaybeForm}))
+	r.Handler(http.MethodPost, "/maybes/maybe/:id/update", dynamicMiddleware.Append(mid.RequireAuthentication(e)).Then(web.Handler{e, mg.updateMaybe}))
 	r.Handler(http.MethodGet, "/tags", dynamicMiddleware.Append(mid.RequireAuthentication(e)).Then(web.Handler{e, mg.getAllTags}))
-	r.Handler(http.MethodGet, "/tags/:id", dynamicMiddleware.Append(mid.RequireAuthentication(e)).Then(web.Handler{e, mg.getMaybesByTag}))
+	r.Handler(http.MethodGet, "/tags/tag/:id", dynamicMiddleware.Append(mid.RequireAuthentication(e)).Then(web.Handler{e, mg.getMaybesByTag}))
 
 	// user
 	ug := userGroup{
@@ -56,7 +56,7 @@ func New(e *env.Env, db *sqlx.DB) http.Handler {
 
 	// fileServer
 	fileServer := http.FileServer(web.NeuteredFileSystem{http.Dir("./ui/static/")})
-	r.Handler(http.MethodGet, "/static/*", http.StripPrefix("/static", fileServer))
+	r.Handler(http.MethodGet, "/static/*filepath", http.StripPrefix("/static", fileServer))
 
 	return standardMiddleware.Then(r)
 }
