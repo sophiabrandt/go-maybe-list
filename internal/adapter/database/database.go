@@ -8,7 +8,7 @@ import (
 
 // New returns a new database connection pool.
 func New(dbName string) (*sqlx.DB, error) {
-	db, err := sqlx.Open("sqlite", "database.sqlite")
+	db, err := sqlx.Open("sqlite", dbName)
 	if err != nil {
 		return nil, errors.Wrap(err, "Unable to open database")
 	}
