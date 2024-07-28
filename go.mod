@@ -6,7 +6,6 @@ require (
 	github.com/alexedwards/scs/v2 v2.8.0
 	github.com/dimiro1/darwin v0.0.0-20240202224157-e03bebccbcd4
 	github.com/go-resty/resty/v2 v2.13.1
-	github.com/golangcollege/sessions v1.2.0
 	github.com/google/uuid v1.6.0
 	github.com/jmoiron/sqlx v1.4.0
 	github.com/justinas/alice v1.2.0
