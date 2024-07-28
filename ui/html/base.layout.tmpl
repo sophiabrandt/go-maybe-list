@@ -27,7 +27,7 @@
           </div>
           <div class="cluster">
               {{if .IsAuthenticated}}
-              <a href="/users/profile/">Profile</a>
+              <a href="/users/profile">Profile</a>
               <form action="/users/logout" method="POST">
                   <input type="hidden" name="csrf_token" value="{{.CSRFToken}}">
                   <button>Logout</button>
