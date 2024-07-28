@@ -96,7 +96,7 @@ func (ug userGroup) login(e *env.Env, w http.ResponseWriter, r *http.Request) er
 }
 
 func (ug userGroup) profile(e *env.Env, w http.ResponseWriter, r *http.Request) error {
-	params := web.Params(r)
+	id := web.ParamByName(r, "id")
 	userID := e.Session.GetString(r, "authenticatedUserID")
 
 	usr, err := ug.user.QueryByID(userID)
@@ -105,7 +105,7 @@ func (ug userGroup) profile(e *env.Env, w http.ResponseWriter, r *http.Request) 
 		case user.ErrNotFound:
 			return web.StatusError{Err: err, Code: http.StatusNotFound}
 		default:
-			return errors.Wrapf(err, "ID : %s", params.ByName("id"))
+			return errors.Wrapf(err, "ID : %s", id)
 		}
 	}
 

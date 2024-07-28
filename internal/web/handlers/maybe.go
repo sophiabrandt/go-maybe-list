@@ -37,10 +37,10 @@ func (mg maybeGroup) getAllMaybes(e *env.Env, w http.ResponseWriter, r *http.Req
 }
 
 func (mg maybeGroup) getMaybesByTag(e *env.Env, w http.ResponseWriter, r *http.Request) error {
-	params := web.Params(r)
+	id := web.ParamByName(r, "id")
 	userID := e.Session.GetString(r, "authenticatedUserID")
 
-	maybes, err := mg.maybe.QueryByTag(params.ByName("id"), userID)
+	maybes, err := mg.maybe.QueryByTag(id, userID)
 	if err != nil {
 		switch errors.Cause(err) {
 		case maybe.ErrInvalidTag:
@@ -56,10 +56,10 @@ func (mg maybeGroup) getMaybesByTag(e *env.Env, w http.ResponseWriter, r *http.R
 }
 
 func (mg maybeGroup) getMaybeByID(e *env.Env, w http.ResponseWriter, r *http.Request) error {
-	params := web.Params(r)
+	id := web.ParamByName(r, "id")
 	userID := e.Session.GetString(r, "authenticatedUserID")
 
-	mb, err := mg.maybe.QueryByID(params.ByName("id"), userID)
+	mb, err := mg.maybe.QueryByID(id, userID)
 	if err != nil {
 		switch errors.Cause(err) {
 		case maybe.ErrInvalidID:
@@ -69,7 +69,7 @@ func (mg maybeGroup) getMaybeByID(e *env.Env, w http.ResponseWriter, r *http.Req
 		case maybe.ErrNotFound:
 			return web.StatusError{Err: err, Code: http.StatusNotFound}
 		default:
-			return errors.Wrapf(err, "ID : %s", params.ByName("id"))
+			return errors.Wrapf(err, "ID : %s", id)
 		}
 	}
 
@@ -133,10 +133,10 @@ func (mg maybeGroup) createMaybe(e *env.Env, w http.ResponseWriter, r *http.Requ
 }
 
 func (mg maybeGroup) updateMaybeForm(e *env.Env, w http.ResponseWriter, r *http.Request) error {
-	params := web.Params(r)
+	id := web.ParamByName(r, "id")
 	userID := e.Session.GetString(r, "authenticatedUserID")
 
-	mb, err := mg.maybe.QueryByID(params.ByName("id"), userID)
+	mb, err := mg.maybe.QueryByID(id, userID)
 	if err != nil {
 		switch errors.Cause(err) {
 		case maybe.ErrInvalidID:
@@ -144,7 +144,7 @@ func (mg maybeGroup) updateMaybeForm(e *env.Env, w http.ResponseWriter, r *http.
 		case maybe.ErrNotFound:
 			return web.StatusError{Err: err, Code: http.StatusNotFound}
 		default:
-			return errors.Wrapf(err, "ID : %s", params.ByName("id"))
+			return errors.Wrapf(err, "ID : %s", id)
 		}
 	}
 
@@ -166,7 +166,7 @@ func (mg maybeGroup) updateMaybeForm(e *env.Env, w http.ResponseWriter, r *http.
 }
 
 func (mg maybeGroup) updateMaybe(e *env.Env, w http.ResponseWriter, r *http.Request) error {
-	params := web.Params(r)
+	id := web.ParamByName(r, "id")
 	// form validation
 	form := forms.New(r.PostForm)
 	form.MaxLength("title", 255)
@@ -199,7 +199,7 @@ func (mg maybeGroup) updateMaybe(e *env.Env, w http.ResponseWriter, r *http.Requ
 
 	userID := e.Session.GetString(r, "authenticatedUserID")
 
-	err := mg.maybe.Update(um, params.ByName("id"), userID)
+	err := mg.maybe.Update(um, id, userID)
 	if err != nil {
 		switch errors.Cause(err) {
 		case maybe.ErrInvalidID:
@@ -217,15 +217,15 @@ func (mg maybeGroup) updateMaybe(e *env.Env, w http.ResponseWriter, r *http.Requ
 
 	e.Session.Put(r, "flash", "Maybe successfully updated!")
 
-	http.Redirect(w, r, fmt.Sprintf("/maybes/maybe/%v", params.ByName("id")), http.StatusSeeOther)
+	http.Redirect(w, r, fmt.Sprintf("/maybes/maybe/%v", id), http.StatusSeeOther)
 
 	return nil
 }
 
 func (mg maybeGroup) deleteMaybe(e *env.Env, w http.ResponseWriter, r *http.Request) error {
-	params := web.Params(r)
+	id := web.ParamByName(r, "id")
 
-	err := mg.maybe.Delete(params.ByName("id"))
+	err := mg.maybe.Delete(id)
 	if err != nil {
 		switch errors.Cause(err) {
 		case maybe.ErrInvalidID:
@@ -233,7 +233,7 @@ func (mg maybeGroup) deleteMaybe(e *env.Env, w http.ResponseWriter, r *http.Requ
 		case maybe.ErrNotFound:
 			return web.StatusError{Err: err, Code: http.StatusNotFound}
 		default:
-			return errors.Wrapf(err, "deleting maybe with ID: %s", params.ByName("id"))
+			return errors.Wrapf(err, "deleting maybe with ID: %s", id)
 		}
 	}
 

@@ -4,7 +4,6 @@ import (
 	"net/http"
 
 	"github.com/jmoiron/sqlx"
-	"github.com/julienschmidt/httprouter"
 	"github.com/justinas/alice"
 	"github.com/sophiabrandt/go-maybe-list/internal/data/maybe"
 	"github.com/sophiabrandt/go-maybe-list/internal/data/user"
@@ -19,44 +18,44 @@ func New(e *env.Env, db *sqlx.DB) http.Handler {
 
 	dynamicMiddleware := alice.New(e.Session.Enable, mid.NoSurf, mid.Authenticate(e, user.New(db)))
 
-	r := httprouter.New()
+	r := http.NewServeMux()
 
 	// liveness check
 	dg := debugGroup{
 		db: db,
 	}
-	r.Handler(http.MethodGet, "/debug/health", web.Handler{e, dg.health})
+	r.Handle("GET /debug/health", web.Handler{E: e, H: dg.health})
 
 	// maybe routes
 	mg := maybeGroup{
 		maybe: maybe.New(db),
 	}
-	r.Handler(http.MethodGet, "/", dynamicMiddleware.Then(web.Handler{e, mg.getAllMaybes}))
-	r.Handler(http.MethodGet, "/maybes/new", dynamicMiddleware.Append(mid.RequireAuthentication(e)).Then(web.Handler{e, mg.createMaybeForm}))
-	r.Handler(http.MethodPost, "/maybes/new", dynamicMiddleware.Append(mid.RequireAuthentication(e)).Then(web.Handler{e, mg.createMaybe}))
-	r.Handler(http.MethodGet, "/maybes/maybe/:id", dynamicMiddleware.Append(mid.RequireAuthentication(e)).Then(web.Handler{e, mg.getMaybeByID}))
-	r.Handler(http.MethodPost, "/maybes/maybe/:id/delete", dynamicMiddleware.Append(mid.RequireAuthentication(e)).Then(web.Handler{e, mg.deleteMaybe}))
-	r.Handler(http.MethodGet, "/maybes/maybe/:id/update", dynamicMiddleware.Append(mid.RequireAuthentication(e)).Then(web.Handler{e, mg.updateMaybeForm}))
-	r.Handler(http.MethodPost, "/maybes/maybe/:id/update", dynamicMiddleware.Append(mid.RequireAuthentication(e)).Then(web.Handler{e, mg.updateMaybe}))
-	r.Handler(http.MethodGet, "/tags", dynamicMiddleware.Append(mid.RequireAuthentication(e)).Then(web.Handler{e, mg.getAllTags}))
-	r.Handler(http.MethodGet, "/tags/tag/:id", dynamicMiddleware.Append(mid.RequireAuthentication(e)).Then(web.Handler{e, mg.getMaybesByTag}))
+	r.Handle("GET /", dynamicMiddleware.Then(web.Handler{E: e, H: mg.getAllMaybes}))
+	r.Handle("GET /maybes/new", dynamicMiddleware.Append(mid.RequireAuthentication(e)).Then(web.Handler{E: e, H: mg.createMaybeForm}))
+	r.Handle("POST /maybes/new", dynamicMiddleware.Append(mid.RequireAuthentication(e)).Then(web.Handler{E: e, H: mg.createMaybe}))
+	r.Handle("GET /maybes/maybe/{id}", dynamicMiddleware.Append(mid.RequireAuthentication(e)).Then(web.Handler{E: e, H: mg.getMaybeByID}))
+	r.Handle("POST /maybes/maybe/{id}/delete", dynamicMiddleware.Append(mid.RequireAuthentication(e)).Then(web.Handler{E: e, H: mg.deleteMaybe}))
+	r.Handle("GET /maybes/maybe/{id}/update", dynamicMiddleware.Append(mid.RequireAuthentication(e)).Then(web.Handler{E: e, H: mg.updateMaybeForm}))
+	r.Handle("POST /maybes/maybe/{id}/update", dynamicMiddleware.Append(mid.RequireAuthentication(e)).Then(web.Handler{E: e, H: mg.updateMaybe}))
+	r.Handle("GET /tags", dynamicMiddleware.Append(mid.RequireAuthentication(e)).Then(web.Handler{E: e, H: mg.getAllTags}))
+	r.Handle("GET /tags/tag/{id}", dynamicMiddleware.Append(mid.RequireAuthentication(e)).Then(web.Handler{E: e, H: mg.getMaybesByTag}))
 
 	// user
 	ug := userGroup{
 		user: user.New(db),
 	}
-	r.Handler(http.MethodGet, "/users/signup", dynamicMiddleware.Then(web.Handler{e, ug.signupForm}))
-	r.Handler(http.MethodPost, "/users/signup", dynamicMiddleware.Then(web.Handler{e, ug.signup}))
-	r.Handler(http.MethodGet, "/users/login", dynamicMiddleware.Then(web.Handler{e, ug.loginForm}))
-	r.Handler(http.MethodPost, "/users/login", dynamicMiddleware.Then(web.Handler{e, ug.login}))
-	r.Handler(http.MethodPost, "/users/logout", dynamicMiddleware.Append(mid.RequireAuthentication(e)).Then(web.Handler{e, ug.logout}))
-	r.Handler(http.MethodGet, "/users/profile", dynamicMiddleware.Append(mid.RequireAuthentication(e)).Then(web.Handler{e, ug.profile}))
-	r.Handler(http.MethodGet, "/users/change-password", dynamicMiddleware.Append(mid.RequireAuthentication(e)).Then(web.Handler{e, ug.changePasswordForm}))
-	r.Handler(http.MethodPost, "/users/change-password", dynamicMiddleware.Append(mid.RequireAuthentication(e)).Then(web.Handler{e, ug.changePassword}))
+	r.Handle("GET /users/signup", dynamicMiddleware.Then(web.Handler{E: e, H: ug.signupForm}))
+	r.Handle("POST /users/signup", dynamicMiddleware.Then(web.Handler{E: e, H: ug.signup}))
+	r.Handle("GET /users/login", dynamicMiddleware.Then(web.Handler{E: e, H: ug.loginForm}))
+	r.Handle("POST /users/login", dynamicMiddleware.Then(web.Handler{E: e, H: ug.login}))
+	r.Handle("POST /users/logout", dynamicMiddleware.Append(mid.RequireAuthentication(e)).Then(web.Handler{E: e, H: ug.logout}))
+	r.Handle("GET /users/profile", dynamicMiddleware.Append(mid.RequireAuthentication(e)).Then(web.Handler{E: e, H: ug.profile}))
+	r.Handle("GET /users/change-password", dynamicMiddleware.Append(mid.RequireAuthentication(e)).Then(web.Handler{E: e, H: ug.changePasswordForm}))
+	r.Handle("POST /users/change-password", dynamicMiddleware.Append(mid.RequireAuthentication(e)).Then(web.Handler{E: e, H: ug.changePassword}))
 
 	// fileServer
-	fileServer := http.FileServer(web.NeuteredFileSystem{http.Dir("./ui/static/")})
-	r.Handler(http.MethodGet, "/static/*filepath", http.StripPrefix("/static", fileServer))
+	fileServer := http.FileServer(web.NeuteredFileSystem{Fs: http.Dir("./ui/static/")})
+	r.Handle("GET /static/", http.StripPrefix("/static", fileServer))
 
 	return standardMiddleware.Then(r)
 }

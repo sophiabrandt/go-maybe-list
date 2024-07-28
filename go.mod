@@ -8,7 +8,6 @@ require (
 	github.com/golangcollege/sessions v1.2.0
 	github.com/google/uuid v1.6.0
 	github.com/jmoiron/sqlx v1.4.0
-	github.com/julienschmidt/httprouter v1.3.0
 	github.com/justinas/alice v1.2.0
 	github.com/justinas/nosurf v1.1.1
 	github.com/pkg/errors v0.9.1

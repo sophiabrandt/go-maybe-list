@@ -3,13 +3,12 @@ package web
 import (
 	"net/http"
 
-	"github.com/julienschmidt/httprouter"
 	"github.com/sophiabrandt/go-maybe-list/internal/env"
 )
 
-// Params returns the web call parameters from the request.
-func Params(r *http.Request) httprouter.Params {
-	return httprouter.ParamsFromContext(r.Context())
+// ParamByName returns the value of the first param with the given name.
+func ParamByName(r *http.Request, name string) string {
+	return r.PathValue(name)
 }
 
 // IsAuthenticated checks the current request for an authenticated user.
