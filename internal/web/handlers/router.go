@@ -30,7 +30,7 @@ func New(e *env.Env, db *sqlx.DB) http.Handler {
 	mg := maybeGroup{
 		maybe: maybe.New(db),
 	}
-	r.Handle("GET /{$}", dynamicMiddleware.Then(web.Handler{E: e, H: mg.getAllMaybes}))
+	r.Handle("GET /", dynamicMiddleware.Then(web.Handler{E: e, H: mg.getAllMaybes}))
 	r.Handle("GET /maybes/new", dynamicMiddleware.Append(mid.RequireAuthentication(e)).Then(web.Handler{E: e, H: mg.createMaybeForm}))
 	r.Handle("POST /maybes/new", dynamicMiddleware.Append(mid.RequireAuthentication(e)).Then(web.Handler{E: e, H: mg.createMaybe}))
 	r.Handle("GET /maybes/maybe/{id}", dynamicMiddleware.Append(mid.RequireAuthentication(e)).Then(web.Handler{E: e, H: mg.getMaybeByID}))
