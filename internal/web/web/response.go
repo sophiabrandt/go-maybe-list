@@ -17,7 +17,7 @@ func addDefaultData(e *env.Env, r *http.Request, dt *data.TemplateData) *data.Te
 		dt = &data.TemplateData{}
 	}
 	dt.CurrentYear = time.Now().Year()
-	dt.Flash = e.Session.PopString(r, "flash")
+	dt.Flash = e.Session.PopString(r.Context(), "flash")
 	dt.IsAuthenticated = IsAuthenticated(e, r)
 	dt.CSRFToken = nosurf.Token(r)
 

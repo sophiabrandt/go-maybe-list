@@ -108,16 +108,16 @@ func SecureHeaders(next http.Handler) http.Handler {
 func Authenticate(e *env.Env, ur user.RepositoryDb) func(http.Handler) http.Handler {
 	return func(next http.Handler) http.Handler {
 		fn := func(w http.ResponseWriter, r *http.Request) {
-			exists := e.Session.Exists(r, "authenticatedUserID")
+			exists := e.Session.Exists(r.Context(), "authenticatedUserID")
 			if !exists {
 				next.ServeHTTP(w, r)
 				return
 			}
 
 			// check for existing user
-			usr, err := ur.QueryByID(e.Session.GetString(r, "authenticatedUserID"))
+			usr, err := ur.QueryByID(e.Session.GetString(r.Context(), "authenticatedUserID"))
 			if errors.Is(err, user.ErrNotFound) || !usr.Active {
-				e.Session.Remove(r, "authenticatedUserID")
+				e.Session.Remove(r.Context(), "authenticatedUserID")
 				next.ServeHTTP(w, r)
 				return
 			} else if err != nil {
@@ -139,7 +139,7 @@ func RequireAuthentication(e *env.Env) func(http.Handler) http.Handler {
 		fn := func(w http.ResponseWriter, r *http.Request) {
 			if !web.IsAuthenticated(e, r) {
 				// add path that the user is trying to access to session data
-				e.Session.Put(r, "redirectPathAfterLogin", r.URL.Path)
+				e.Session.Put(r.Context(), "redirectPathAfterLogin", r.URL.Path)
 				// redirect to login
 				http.Redirect(w, r, "/users/login", http.StatusSeeOther)
 				return

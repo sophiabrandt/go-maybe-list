@@ -16,7 +16,7 @@ import (
 func New(e *env.Env, db *sqlx.DB) http.Handler {
 	standardMiddleware := alice.New(mid.SecureHeaders, mid.LogRequest(e.Log), mid.RecoverPanic(e.Log))
 
-	dynamicMiddleware := alice.New(e.Session.Enable, mid.NoSurf, mid.Authenticate(e, user.New(db)))
+	dynamicMiddleware := alice.New(e.Session.LoadAndSave, mid.NoSurf, mid.Authenticate(e, user.New(db)))
 
 	r := http.NewServeMux()
 

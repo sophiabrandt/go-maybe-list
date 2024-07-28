@@ -45,7 +45,6 @@ func run(ctx context.Context, log *log.Logger) error {
 	log.Println("main : Started : Application initializing")
 
 	addr := flag.String("addr", "0.0.0.0:4000", "Http network address")
-	secret := flag.String("secret", "60FNA&6bdH+FnhG306I6MNCY8bv_WjwDcjB", "Secret key")
 	dbName := flag.String("dbName", "database.sqlite", "database name")
 	flag.Parse()
 
@@ -58,7 +57,7 @@ func run(ctx context.Context, log *log.Logger) error {
 
 	// initialize global dependencies
 	tc, err := templates.NewCache("./ui/html")
-	ses := session.New(*secret)
+	ses := session.New()
 
 	env := env.New(log, tc, ses)
 

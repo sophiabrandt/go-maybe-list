@@ -54,14 +54,14 @@ func (ug userGroup) signup(e *env.Env, w http.ResponseWriter, r *http.Request) e
 		}
 	}
 
-	e.Session.Put(r, "flash", "Signup successful. Please log in.")
+	e.Session.Put(r.Context(), "flash", "Signup successful. Please log in.")
 	http.Redirect(w, r, "/users/login", http.StatusSeeOther)
 	return nil
 }
 
 func (ug userGroup) logout(e *env.Env, w http.ResponseWriter, r *http.Request) error {
-	e.Session.Remove(r, "authenticatedUserID")
-	e.Session.Put(r, "flash", "You've been logged out successfully!")
+	e.Session.Remove(r.Context(), "authenticatedUserID")
+	e.Session.Put(r.Context(), "flash", "You've been logged out successfully!")
 	http.Redirect(w, r, "/", http.StatusSeeOther)
 	return nil
 }
@@ -83,9 +83,13 @@ func (ug userGroup) login(e *env.Env, w http.ResponseWriter, r *http.Request) er
 		}
 	}
 
-	e.Session.Put(r, "authenticatedUserID", id)
+	err = e.Session.RenewToken(r.Context())
+	if err != nil {
+		return web.Render(e, w, r, "login.page.tmpl", &data.TemplateData{Form: form}, http.StatusInternalServerError)
+	}
+	e.Session.Put(r.Context(), "authenticatedUserID", id)
 
-	path := e.Session.PopString(r, "redirectPathAfterLogin")
+	path := e.Session.PopString(r.Context(), "redirectPathAfterLogin")
 	if path != "" {
 		http.Redirect(w, r, path, http.StatusSeeOther)
 		return nil
@@ -97,7 +101,7 @@ func (ug userGroup) login(e *env.Env, w http.ResponseWriter, r *http.Request) er
 
 func (ug userGroup) profile(e *env.Env, w http.ResponseWriter, r *http.Request) error {
 	id := web.ParamByName(r, "id")
-	userID := e.Session.GetString(r, "authenticatedUserID")
+	userID := e.Session.GetString(r.Context(), "authenticatedUserID")
 
 	usr, err := ug.user.QueryByID(userID)
 	if err != nil {
@@ -126,7 +130,7 @@ func (ug userGroup) changePassword(e *env.Env, w http.ResponseWriter, r *http.Re
 		return web.Render(e, w, r, "changepassword.page.tmpl", &data.TemplateData{Form: form}, http.StatusUnprocessableEntity)
 	}
 
-	userID := e.Session.GetString(r, "authenticatedUserID")
+	userID := e.Session.GetString(r.Context(), "authenticatedUserID")
 
 	err := ug.user.ChangePassword(form.Get("current password"), form.Get("password"), userID)
 	if err != nil {
@@ -141,7 +145,7 @@ func (ug userGroup) changePassword(e *env.Env, w http.ResponseWriter, r *http.Re
 		}
 	}
 
-	e.Session.Put(r, "flash", "Password successfully updated!")
+	e.Session.Put(r.Context(), "flash", "Password successfully updated!")
 
 	http.Redirect(w, r, "/users/profile", http.StatusSeeOther)
 	return nil

@@ -3,6 +3,7 @@ module github.com/sophiabrandt/go-maybe-list
 go 1.22
 
 require (
+	github.com/alexedwards/scs/v2 v2.8.0
 	github.com/dimiro1/darwin v0.0.0-20240202224157-e03bebccbcd4
 	github.com/go-resty/resty/v2 v2.13.1
 	github.com/golangcollege/sessions v1.2.0

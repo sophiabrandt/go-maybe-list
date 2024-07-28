@@ -4,14 +4,15 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/golangcollege/sessions"
+	"github.com/alexedwards/scs/v2"
 )
 
 // New creates the session manager.
-func New(secret string) *sessions.Session {
-	session := sessions.New([]byte(secret))
+func New() *scs.SessionManager {
+	session := scs.New()
 	session.Lifetime = 12 * time.Hour
-	session.Persist = true
-	session.SameSite = http.SameSiteStrictMode
+	session.Cookie.Persist = true
+	session.Cookie.SameSite = http.SameSiteStrictMode
+	session.Cookie.Secure = true
 	return session
 }

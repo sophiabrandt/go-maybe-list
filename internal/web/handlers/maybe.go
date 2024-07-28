@@ -27,7 +27,7 @@ type maybeGroup struct {
 }
 
 func (mg maybeGroup) getAllMaybes(e *env.Env, w http.ResponseWriter, r *http.Request) error {
-	userID := e.Session.GetString(r, "authenticatedUserID")
+	userID := e.Session.GetString(r.Context(), "authenticatedUserID")
 	maybes, err := mg.maybe.Query(userID)
 	if err != nil {
 		return web.StatusError{Err: err, Code: http.StatusInternalServerError}
@@ -38,7 +38,7 @@ func (mg maybeGroup) getAllMaybes(e *env.Env, w http.ResponseWriter, r *http.Req
 
 func (mg maybeGroup) getMaybesByTag(e *env.Env, w http.ResponseWriter, r *http.Request) error {
 	id := web.ParamByName(r, "id")
-	userID := e.Session.GetString(r, "authenticatedUserID")
+	userID := e.Session.GetString(r.Context(), "authenticatedUserID")
 
 	maybes, err := mg.maybe.QueryByTag(id, userID)
 	if err != nil {
@@ -57,7 +57,7 @@ func (mg maybeGroup) getMaybesByTag(e *env.Env, w http.ResponseWriter, r *http.R
 
 func (mg maybeGroup) getMaybeByID(e *env.Env, w http.ResponseWriter, r *http.Request) error {
 	id := web.ParamByName(r, "id")
-	userID := e.Session.GetString(r, "authenticatedUserID")
+	userID := e.Session.GetString(r.Context(), "authenticatedUserID")
 
 	mb, err := mg.maybe.QueryByID(id, userID)
 	if err != nil {
@@ -112,7 +112,7 @@ func (mg maybeGroup) createMaybe(e *env.Env, w http.ResponseWriter, r *http.Requ
 		nm.Tags = trimT
 	}
 
-	userID := e.Session.GetString(r, "authenticatedUserID")
+	userID := e.Session.GetString(r.Context(), "authenticatedUserID")
 
 	myb, err := mg.maybe.Create(nm, userID)
 	if err != nil {
@@ -125,7 +125,7 @@ func (mg maybeGroup) createMaybe(e *env.Env, w http.ResponseWriter, r *http.Requ
 		}
 	}
 
-	e.Session.Put(r, "flash", "Maybe successfully created!")
+	e.Session.Put(r.Context(), "flash", "Maybe successfully created!")
 
 	http.Redirect(w, r, fmt.Sprintf("/maybes/maybe/%v", myb.ID), http.StatusSeeOther)
 
@@ -134,7 +134,7 @@ func (mg maybeGroup) createMaybe(e *env.Env, w http.ResponseWriter, r *http.Requ
 
 func (mg maybeGroup) updateMaybeForm(e *env.Env, w http.ResponseWriter, r *http.Request) error {
 	id := web.ParamByName(r, "id")
-	userID := e.Session.GetString(r, "authenticatedUserID")
+	userID := e.Session.GetString(r.Context(), "authenticatedUserID")
 
 	mb, err := mg.maybe.QueryByID(id, userID)
 	if err != nil {
@@ -197,7 +197,7 @@ func (mg maybeGroup) updateMaybe(e *env.Env, w http.ResponseWriter, r *http.Requ
 		um.Tags = trimT
 	}
 
-	userID := e.Session.GetString(r, "authenticatedUserID")
+	userID := e.Session.GetString(r.Context(), "authenticatedUserID")
 
 	err := mg.maybe.Update(um, id, userID)
 	if err != nil {
@@ -215,7 +215,7 @@ func (mg maybeGroup) updateMaybe(e *env.Env, w http.ResponseWriter, r *http.Requ
 		}
 	}
 
-	e.Session.Put(r, "flash", "Maybe successfully updated!")
+	e.Session.Put(r.Context(), "flash", "Maybe successfully updated!")
 
 	http.Redirect(w, r, fmt.Sprintf("/maybes/maybe/%v", id), http.StatusSeeOther)
 
@@ -237,14 +237,14 @@ func (mg maybeGroup) deleteMaybe(e *env.Env, w http.ResponseWriter, r *http.Requ
 		}
 	}
 
-	e.Session.Put(r, "flash", "Maybe successfully deleted!")
+	e.Session.Put(r.Context(), "flash", "Maybe successfully deleted!")
 
 	http.Redirect(w, r, "/", http.StatusSeeOther)
 	return nil
 }
 
 func (mg maybeGroup) getAllTags(e *env.Env, w http.ResponseWriter, r *http.Request) error {
-	userID := e.Session.GetString(r, "authenticatedUserID")
+	userID := e.Session.GetString(r.Context(), "authenticatedUserID")
 
 	tags, err := mg.maybe.QueryTags(userID)
 	if err != nil {
