@@ -36,4 +36,4 @@ EXPOSE 4000
 
 RUN ./admin -action="migrate"
 
-CMD [ "./web", "-secret=$COOKIE_SECRET" ]
+CMD [ "./web" ]
