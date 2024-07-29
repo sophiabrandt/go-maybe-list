@@ -14,7 +14,7 @@ import (
 )
 
 var (
-	// ErrNotFound is used when a specific Product is requested but does not exist.
+	// ErrNotFound is used when a specific user is requested but does not exist.
 	ErrNotFound = errors.New("not found")
 
 	// ErrInvalidID occurs when an ID is not in a valid form.
@@ -31,18 +31,18 @@ var (
 	ErrForbidden = errors.New("attempted action is not allowed")
 )
 
-// RepositoryDb defines the repository for the user service.
-type RepositoryDb struct {
+// UserRepository defines the repository for the user service.
+type UserRepository struct {
 	Db *sqlx.DB
 }
 
 // New returns a pointer to a user repo.
-func New(db *sqlx.DB) RepositoryDb {
-	return RepositoryDb{Db: db}
+func New(db *sqlx.DB) UserRepository {
+	return UserRepository{Db: db}
 }
 
 // QueryByID gets the specified user from the database.
-func (r RepositoryDb) QueryByID(userID string) (Info, error) {
+func (ur UserRepository) QueryByID(userID string) (Info, error) {
 	if _, err := uuid.Parse(userID); err != nil {
 		return Info{}, ErrInvalidID
 	}
@@ -56,7 +56,7 @@ func (r RepositoryDb) QueryByID(userID string) (Info, error) {
 		user_id = $1`
 
 	var usr Info
-	if err := r.Db.Get(&usr, q, userID); err != nil {
+	if err := ur.Db.Get(&usr, q, userID); err != nil {
 		if err == sql.ErrNoRows {
 			return Info{}, ErrNotFound
 		}
@@ -67,7 +67,7 @@ func (r RepositoryDb) QueryByID(userID string) (Info, error) {
 }
 
 // Create inserts a new user into the database.
-func (r RepositoryDb) Create(user NewUser) (Info, error) {
+func (ur UserRepository) Create(user NewUser) (Info, error) {
 	hash, err := bcrypt.GenerateFromPassword([]byte(user.Password), bcrypt.DefaultCost)
 	if err != nil {
 		return Info{}, errors.Wrap(err, "generating password hash")
@@ -89,7 +89,7 @@ func (r RepositoryDb) Create(user NewUser) (Info, error) {
 	VALUES
 		($1, $2, $3, $4, $5, $6, $7)`
 
-	if _, err = r.Db.Exec(q, usr.ID, usr.Name, usr.Email, usr.PasswordHash, usr.Active, usr.DateCreated, usr.DateUpdated); err != nil {
+	if _, err = ur.Db.Exec(q, usr.ID, usr.Name, usr.Email, usr.PasswordHash, usr.Active, usr.DateCreated, usr.DateUpdated); err != nil {
 		var sqLiteError *sqlite.Error
 		if errors.As(err, &sqLiteError) {
 			if sqLiteError.Code() == 2067 && strings.Contains(sqLiteError.Error(), "users.email") {
@@ -103,7 +103,7 @@ func (r RepositoryDb) Create(user NewUser) (Info, error) {
 }
 
 // Authenticate queries the database for a user with a matching pasword.
-func (r RepositoryDb) Authenticate(email, password string) (string, error) {
+func (ur UserRepository) Authenticate(email, password string) (string, error) {
 	var id string
 	var hash []byte
 	const q = `
@@ -116,7 +116,7 @@ func (r RepositoryDb) Authenticate(email, password string) (string, error) {
 	AND
 		active = TRUE
 	`
-	row := r.Db.QueryRowx(q, email)
+	row := ur.Db.QueryRowx(q, email)
 	err := row.Scan(&id, &hash)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
@@ -136,7 +136,7 @@ func (r RepositoryDb) Authenticate(email, password string) (string, error) {
 	return id, nil
 }
 
-func (r RepositoryDb) ChangePassword(currentPassword, newPassword, userID string) error {
+func (ur UserRepository) ChangePassword(currentPassword, newPassword, userID string) error {
 	var currentPasswordHash []byte
 	const p = `
 	SELECT password_hash
@@ -144,7 +144,7 @@ func (r RepositoryDb) ChangePassword(currentPassword, newPassword, userID string
 	WHERE user_id = $1
 	`
 
-	if err := r.Db.Get(&currentPasswordHash, p, userID); err != nil {
+	if err := ur.Db.Get(&currentPasswordHash, p, userID); err != nil {
 		if err == sql.ErrNoRows {
 			return ErrNotFound
 		}
@@ -174,7 +174,7 @@ func (r RepositoryDb) ChangePassword(currentPassword, newPassword, userID string
 		user_id = $1
 	`
 
-	if _, err := r.Db.Exec(q, userID, newPasswordHash); err != nil {
+	if _, err := ur.Db.Exec(q, userID, newPasswordHash); err != nil {
 		return errors.Wrapf(err, "updating password for user %q", userID)
 	}
 
