@@ -1,0 +1,7 @@
+{
+	http_port 8800
+}
+
+gomaybelist.caddy.localhost {
+	reverse_proxy localhost:4000
+}
