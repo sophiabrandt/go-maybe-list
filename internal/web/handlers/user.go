@@ -79,7 +79,7 @@ func (ug userGroup) login(e *env.Env, w http.ResponseWriter, r *http.Request) er
 			form.Errors.Add("generic", "Email or Password is incorrect")
 			return web.Render(e, w, r, "login.page.tmpl", &data.TemplateData{Form: form}, http.StatusUnprocessableEntity)
 		default:
-			return errors.Wrap(err, "authenticationg")
+			return errors.Wrap(err, "authenticating")
 		}
 	}
 
