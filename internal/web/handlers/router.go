@@ -31,14 +31,14 @@ func New(e *env.Env, db *sqlx.DB) http.Handler {
 		maybe: maybe.New(db),
 	}
 	r.Handle("GET /{$}", dynamicMiddleware.Then(web.Handler{E: e, H: mg.getAllMaybes}))
-	r.Handle("GET /maybes/new", dynamicMiddleware.Append(mid.RequireAuthentication(e)).Then(web.Handler{E: e, H: mg.createMaybeForm}))
-	r.Handle("POST /maybes/new", dynamicMiddleware.Append(mid.RequireAuthentication(e)).Then(web.Handler{E: e, H: mg.createMaybe}))
-	r.Handle("GET /maybes/maybe/{id}", dynamicMiddleware.Append(mid.RequireAuthentication(e)).Then(web.Handler{E: e, H: mg.getMaybeByID}))
-	r.Handle("POST /maybes/maybe/{id}/delete", dynamicMiddleware.Append(mid.RequireAuthentication(e)).Then(web.Handler{E: e, H: mg.deleteMaybe}))
-	r.Handle("GET /maybes/maybe/{id}/update", dynamicMiddleware.Append(mid.RequireAuthentication(e)).Then(web.Handler{E: e, H: mg.updateMaybeForm}))
-	r.Handle("POST /maybes/maybe/{id}/update", dynamicMiddleware.Append(mid.RequireAuthentication(e)).Then(web.Handler{E: e, H: mg.updateMaybe}))
+	r.Handle("GET /maybes/create", dynamicMiddleware.Append(mid.RequireAuthentication(e)).Then(web.Handler{E: e, H: mg.createMaybeForm}))
+	r.Handle("POST /maybes/create", dynamicMiddleware.Append(mid.RequireAuthentication(e)).Then(web.Handler{E: e, H: mg.createMaybe}))
+	r.Handle("GET /maybes/view/{id}", dynamicMiddleware.Append(mid.RequireAuthentication(e)).Then(web.Handler{E: e, H: mg.getMaybeByID}))
+	r.Handle("POST /maybes/delete/{id}", dynamicMiddleware.Append(mid.RequireAuthentication(e)).Then(web.Handler{E: e, H: mg.deleteMaybe}))
+	r.Handle("GET /maybes/update/{id}", dynamicMiddleware.Append(mid.RequireAuthentication(e)).Then(web.Handler{E: e, H: mg.updateMaybeForm}))
+	r.Handle("POST /maybes/update/{id}", dynamicMiddleware.Append(mid.RequireAuthentication(e)).Then(web.Handler{E: e, H: mg.updateMaybe}))
 	r.Handle("GET /tags", dynamicMiddleware.Append(mid.RequireAuthentication(e)).Then(web.Handler{E: e, H: mg.getAllTags}))
-	r.Handle("GET /tags/tag/{id}", dynamicMiddleware.Append(mid.RequireAuthentication(e)).Then(web.Handler{E: e, H: mg.getMaybesByTag}))
+	r.Handle("GET /tags/view/{id}", dynamicMiddleware.Append(mid.RequireAuthentication(e)).Then(web.Handler{E: e, H: mg.getMaybesByTag}))
 
 	// user
 	ug := userGroup{

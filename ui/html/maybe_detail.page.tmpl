@@ -14,15 +14,15 @@
           <p>{{.Description}}</p>
         </div>
         {{range .Tags}}
-        <a href="/tags/tag/{{.ID}}" class="tag">#{{.Name}}</a>
+        <a href="/tags/view/{{.ID}}" class="tag">#{{.Name}}</a>
         {{end}}
       </div>
       <div class="cluster center">
         <div>
           <div>
-            <a href="/maybes/maybe/{{.ID}}/update"><button>Update 🖉</button></a>
+            <a href="/maybes/update/{{.ID}}"><button>Update 🖉</button></a>
           </div>
-          <form action="/maybes/maybe/{{.ID}}/delete" method="POST">
+          <form action="/maybes/delete/{{.ID}}" method="POST">
             <input type="hidden" name="csrf_token" value="{{$csrf_token}}" />
             <button class="danger--button" type="submit">Delete ⚠️</button>
           </form>

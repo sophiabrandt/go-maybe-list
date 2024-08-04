@@ -4,7 +4,7 @@
 
 {{define "main"}}
 {{if .Maybe}}
-<form class="center form" action="/maybes/maybe/{{.Maybe.ID}}/update" method="POST">
+<form class="center form" action="/maybes/update/{{.Maybe.ID}}" method="POST">
   <input type="hidden" name="csrf_token" value="{{.CSRFToken}}">
   {{with .Form}}
   <div class="stack form-background">

@@ -127,7 +127,7 @@ func (mg maybeGroup) createMaybe(e *env.Env, w http.ResponseWriter, r *http.Requ
 
 	e.Session.Put(r.Context(), "flash", "Maybe successfully created!")
 
-	http.Redirect(w, r, fmt.Sprintf("/maybes/maybe/%v", myb.ID), http.StatusSeeOther)
+	http.Redirect(w, r, fmt.Sprintf("/maybes/view/%v", myb.ID), http.StatusSeeOther)
 
 	return nil
 }
@@ -217,7 +217,7 @@ func (mg maybeGroup) updateMaybe(e *env.Env, w http.ResponseWriter, r *http.Requ
 
 	e.Session.Put(r.Context(), "flash", "Maybe successfully updated!")
 
-	http.Redirect(w, r, fmt.Sprintf("/maybes/maybe/%v", id), http.StatusSeeOther)
+	http.Redirect(w, r, fmt.Sprintf("/maybes/view/%v", id), http.StatusSeeOther)
 
 	return nil
 }
