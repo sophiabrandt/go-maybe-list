@@ -5,21 +5,22 @@
 [![Apache 2.0 License][license-shield]][license-url]
 
 <!-- PROJECT LOGO -->
+
 <br />
 <p align="center">
   <a href="https://github.com/sophiabrandt/go-maybe-list">
     <img src="logo.png" alt="Logo">
   </a>
 
-  <h3 align="center">go-maybe-list</h3>
+<h3 align="center">go-maybe-list</h3>
 
-  <p align="center">
+<p align="center">
     Go full-stack web app from scratch
     <br />
     <a href="https://github.com/sophiabrandt/go-maybe-list"><strong>Explore the docs »</strong></a>
     <br />
     <br />
-    <a href="https://gomaybelist.repository.host/">View Demo</a>
+    <a href="https://gomaybelist.compileti.me/">View Demo</a>
     ·
     <a href="https://github.com/sophiabrandt/go-maybe-list/issues">Report Bug</a>
     ·
@@ -28,6 +29,7 @@
 </p>
 
 <!-- TABLE OF CONTENTS -->
+
 <details open="open">
   <summary><h2 style="display: inline-block">Table of Contents</h2></summary>
   <ol>
@@ -65,11 +67,11 @@
 
 **go-maybe-list** is a full-stack web application written in Go. It's written from scratch, without any pre-build web framework like Gin or Echo.
 
-You can save links and ideas as "maybes" for later. Each maybe can have none or one to many tags.  
-You can either view all entries or only entries belonging to a tag.  
+You can save links and ideas as "maybes" for later. Each maybe can have none or one to many tags.\
+You can either view all entries or only entries belonging to a tag.\
 If you update a maybe, tags will be dynamically added, updated or deleted.
 
-I've deployed a **[demo][demo]** (via GitOps/Gitlab CI) to a $5 [Upcloud VPS](https://upcloud.com/) ([How?](https://www.rockyourcode.com/traefik-2-docker-swarm-setup-with-docker-socket-proxy-and-more/)).
+I've deployed a **[demo]** (via GitOps/Gitlab CI) to a $5 [Upcloud VPS](https://upcloud.com/) ([How?](https://www.rockyourcode.com/traefik-2-docker-swarm-setup-with-docker-socket-proxy-and-more/)).
 
 Sign up with a new account to test-drive the application (you can use a temporary email provider if you like).
 
@@ -131,14 +133,15 @@ You'll need Go (Go 1.12 or later) and SQLite.
    git clone https://github.com/sophiabrandt/go-maybe-list.git
    ```
 
-2. Run database migrations.
+1. Run database migrations.
 
    ```sh
    go run ./cmd/admin -action="migrate"
    go run ./cmd/admin -action="seed"
    ```
 
-3. Run web server. Default port is 4000, you can change it with a command line flag.
+1. Run web server. Default port is 4000, you can change it with a command line flag.
+
    ```sh
    go run ./cmd/web
    # go run ./cmd/web -addr="0.0.0.0:8000"
@@ -165,10 +168,10 @@ See the [open issues](https://github.com/sophiabrandt/go-maybe-list/issues) for 
 Contributions are what make the open source community such an amazing place to be learn, inspire, and create. Any contributions you make are **greatly appreciated**.
 
 1. Fork the Project
-2. Create your Feature Branch (`git checkout -b feature/AmazingFeature`)
-3. Commit your Changes (`git commit -m 'Add some AmazingFeature'`)
-4. Push to the Branch (`git push origin feature/AmazingFeature`)
-5. Open a Pull Request
+1. Create your Feature Branch (`git checkout -b feature/AmazingFeature`)
+1. Commit your Changes (`git commit -m 'Add some AmazingFeature'`)
+1. Push to the Branch (`git push origin feature/AmazingFeature`)
+1. Open a Pull Request
 
 <!-- LICENSE -->
 
@@ -199,12 +202,13 @@ Project Link: [https://github.com/sophiabrandt/go-maybe-list](https://github.com
 - [Every Layout](https://every-layout.dev)
 
 <!-- MARKDOWN LINKS & IMAGES -->
+
 <!-- https://www.markdownguide.org/basic-syntax/#reference-style-links -->
 
 [contributors-shield]: https://img.shields.io/github/contributors/sophiabrandt/go-maybe-list.svg?style=for-the-badge
 [contributors-url]: https://github.com/sophiabrandt/go-maybe-list/graphs/contributors
+[demo]: https://gomaybelist.compileti.me/
 [issues-shield]: https://img.shields.io/github/issues/sophiabrandt/go-maybe-list.svg?style=for-the-badge
 [issues-url]: https://github.com/sophiabrandt/go-maybe-list/issues
 [license-shield]: https://img.shields.io/github/license/sophiabrandt/go-maybe-list.svg?style=for-the-badge
 [license-url]: https://github.com/sophiabrandt/go-maybe-list/blob/master/LICENSE
-[demo]: https://gomaybelist.repository.host/
