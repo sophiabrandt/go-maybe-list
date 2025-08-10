@@ -2,7 +2,7 @@ version: '3.8'
 
 services:
   gomaybelist:
-    image: registry.gitlab.com/repository.host/go-maybe-list:latest
+    image: registry.gitlab.com/infra-traefik-swarm/go-maybe-list:latest
     deploy:
       labels:
         - traefik.enable=true
