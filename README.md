@@ -183,7 +183,7 @@ Apache 2.0 License, see [`LICENSE`](LICENSE).
 
 ## Contact
 
-Sophia Brandt - [@hisophiabrandt](https://twitter.com/hisophiabrandt)
+Sophia Brandt - [@sbr@hachyderm.io](https://hachyderm.io/@sbr)
 
 Project Link: [https://github.com/sophiabrandt/go-maybe-list](https://github.com/sophiabrandt/go-maybe-list)
 
